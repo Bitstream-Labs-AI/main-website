@@ -16,8 +16,7 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix --cache",
-    "format": "prettier --write --experimental-cli \"**/*.{js,jsx,ts,tsx,vue,css,scss,json,md}\" --ignore-path .gitignore",
-    "prepare": "husky install || true"
+    "format": "prettier --write --experimental-cli \"**/*.{js,jsx,ts,tsx,vue,css,scss,json,md}\" --ignore-path .gitignore"
   },
   "dependencies": {
     "@heroicons/vue": "^2.2.0",
