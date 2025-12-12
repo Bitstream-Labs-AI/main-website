@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { z } from 'zod'
 
 export interface ContactFormData {
   name: string
@@ -18,8 +19,13 @@ const props = withDefaults(defineProps<Props>(), {
   onSubmit: undefined,
 })
 
+// Utility function to shuffle an array randomly
+const shuffleArray = <T,>(array: T[]): T[] => {
+  return [...array].sort(() => Math.random() - 0.5)
+}
+
 // Diverse placeholder names - rotated to avoid pinning down specific cultures
-const placeholderNames = [
+const placeholderNamesBase = [
   { name: 'Alex Chen', email: 'alex.chen@example.com' },
   { name: 'Sam Taylor', email: 'sam.taylor@example.com' },
   { name: 'Jordan Kim', email: 'jordan.kim@example.com' },
@@ -30,20 +36,69 @@ const placeholderNames = [
   { name: 'Quinn Williams', email: 'quinn.williams@example.com' },
 ]
 
+// Organization types most likely to solicit AI benchmarking and hardware consulting services
+const placeholderOrganizationsBase = [
+  'Research Lab',
+  'University',
+  'Tech Company',
+  'Startup',
+  'Government Agency',
+  'Hardware Manufacturer',
+  'AI Company',
+  'Consulting Firm',
+]
+
+// Referral types representing how people are likely to discover the service
+const placeholderReferralsBase = [
+  'Conference',
+  'Colleague',
+  'Research Partner',
+  'Accelerator',
+  'Investor',
+  'University Partner',
+  'Industry Friend',
+  'Online Article',
+]
+
+// Shuffle all arrays randomly
+const placeholderNames = shuffleArray(placeholderNamesBase)
+const placeholderOrganizations = shuffleArray(placeholderOrganizationsBase)
+const placeholderReferrals = shuffleArray(placeholderReferralsBase)
+
 const placeholderName = ref(placeholderNames[0]?.name ?? '')
 const placeholderEmail = ref(placeholderNames[0]?.email ?? '')
+const placeholderOrganizationName = ref(placeholderOrganizations[0] ?? '')
+const placeholderReferralSource = ref(placeholderReferrals[0] ?? '')
+
 const isFadingOut = ref(false)
 const isFadingIn = ref(false)
+const isFadingOutOrg = ref(false)
+const isFadingInOrg = ref(false)
+const isFadingOutReferral = ref(false)
+const isFadingInReferral = ref(false)
+
 let currentIndex = 0
+let currentOrgIndex = 0
+let currentReferralIndex = 0
 let rotationInterval: ReturnType<typeof setInterval> | null = null
 
 // Rotate through placeholder names with fade transition
 const rotatePlaceholder = (): void => {
+  // Rotate name/email
   isFadingOut.value = true
   isFadingIn.value = false
 
+  // Rotate organization name
+  isFadingOutOrg.value = true
+  isFadingInOrg.value = false
+
+  // Rotate referral source
+  isFadingOutReferral.value = true
+  isFadingInReferral.value = false
+
   // After fade out completes, update text and fade in
   setTimeout(() => {
+    // Update name/email
     currentIndex = (currentIndex + 1) % placeholderNames.length
     const currentPlaceholder = placeholderNames[currentIndex]
     if (currentPlaceholder) {
@@ -52,23 +107,43 @@ const rotatePlaceholder = (): void => {
     }
     isFadingOut.value = false
     isFadingIn.value = true
+
+    // Update organization name
+    currentOrgIndex = (currentOrgIndex + 1) % placeholderOrganizations.length
+    placeholderOrganizationName.value = placeholderOrganizations[currentOrgIndex] ?? ''
+    isFadingOutOrg.value = false
+    isFadingInOrg.value = true
+
+    // Update referral source
+    currentReferralIndex = (currentReferralIndex + 1) % placeholderReferrals.length
+    placeholderReferralSource.value = placeholderReferrals[currentReferralIndex] ?? ''
+    isFadingOutReferral.value = false
+    isFadingInReferral.value = true
   }, 400) // Fade out duration
 
   // Remove fade-in class after animation completes
   setTimeout(() => {
     isFadingIn.value = false
+    isFadingInOrg.value = false
+    isFadingInReferral.value = false
   }, 800) // Fade out (400ms) + fade in (400ms)
 }
 
 // Start rotation on mount
 onMounted(() => {
-  // Randomly select initial placeholder
+  // Randomly select initial placeholders
   currentIndex = Math.floor(Math.random() * placeholderNames.length)
   const currentPlaceholder = placeholderNames[currentIndex]
   if (currentPlaceholder) {
     placeholderName.value = currentPlaceholder.name
     placeholderEmail.value = currentPlaceholder.email
   }
+
+  currentOrgIndex = Math.floor(Math.random() * placeholderOrganizations.length)
+  placeholderOrganizationName.value = placeholderOrganizations[currentOrgIndex] ?? ''
+
+  currentReferralIndex = Math.floor(Math.random() * placeholderReferrals.length)
+  placeholderReferralSource.value = placeholderReferrals[currentReferralIndex] ?? ''
 
   // Start rotating every 5 seconds
   rotationInterval = setInterval(rotatePlaceholder, 5000)
@@ -92,29 +167,50 @@ const errors = ref<Partial<Record<keyof ContactFormData, string>>>({})
 const isSubmitting = ref(false)
 const submitStatus = ref<'idle' | 'success' | 'error'>('idle')
 
-const validateEmail = (emailValue: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(emailValue)
-}
+// ZOD schema for form validation
+const contactFormSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required'),
+  email: z
+    .string()
+    .trim()
+    .superRefine((val, ctx) => {
+      if (!val || val.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Email is required',
+        })
+        return
+      }
+      if (!z.string().email().safeParse(val).success) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Please enter a valid email address',
+        })
+      }
+    }),
+  organizationName: z.string().trim().optional(),
+  organizationDescription: z.string().trim().optional(),
+  referralSource: z.string().trim().optional(),
+  message: z.string().trim().min(1, 'Message is required'),
+})
 
-const validate = (): boolean => {
+const validate = (formData: Partial<ContactFormData>): boolean => {
   errors.value = {}
 
-  if (!name.value.trim()) {
-    errors.value.name = 'Name is required'
+  const result = contactFormSchema.safeParse(formData)
+
+  if (!result.success) {
+    // Map ZOD errors to the existing error format
+    result.error.issues.forEach((issue) => {
+      const field = issue.path[0] as keyof ContactFormData
+      if (field) {
+        errors.value[field] = issue.message
+      }
+    })
+    return false
   }
 
-  if (!email.value.trim()) {
-    errors.value.email = 'Email is required'
-  } else if (!validateEmail(email.value)) {
-    errors.value.email = 'Please enter a valid email address'
-  }
-
-  if (!message.value.trim()) {
-    errors.value.message = 'Message is required'
-  }
-
-  return Object.keys(errors.value).length === 0
+  return true
 }
 
 const handleSubmit = async (event: Event): Promise<void> => {
@@ -124,7 +220,27 @@ const handleSubmit = async (event: Event): Promise<void> => {
   // Clear previous errors
   errors.value = {}
 
-  if (!validate()) {
+  // Build form data object with trimmed values
+  const formData: Partial<ContactFormData> = {
+    name: name.value.trim(),
+    email: email.value.trim(),
+    message: message.value.trim(),
+  }
+
+  if (organizationName.value.trim()) {
+    formData.organizationName = organizationName.value.trim()
+  }
+
+  if (organizationDescription.value.trim()) {
+    formData.organizationDescription = organizationDescription.value.trim()
+  }
+
+  if (referralSource.value.trim()) {
+    formData.referralSource = referralSource.value.trim()
+  }
+
+  // Validate using ZOD schema
+  if (!validate(formData)) {
     // Ensure errors are visible by forcing a re-render
     return
   }
@@ -133,26 +249,11 @@ const handleSubmit = async (event: Event): Promise<void> => {
   submitStatus.value = 'idle'
 
   try {
-    const formData: ContactFormData = {
-      name: name.value.trim(),
-      email: email.value.trim(),
-      message: message.value.trim(),
-    }
-
-    if (organizationName.value.trim()) {
-      formData.organizationName = organizationName.value.trim()
-    }
-
-    if (organizationDescription.value.trim()) {
-      formData.organizationDescription = organizationDescription.value.trim()
-    }
-
-    if (referralSource.value.trim()) {
-      formData.referralSource = referralSource.value.trim()
-    }
+    // Use validated form data (ZOD ensures it matches ContactFormData type)
+    const validatedData = contactFormSchema.parse(formData) as ContactFormData
 
     if (props.onSubmit) {
-      await props.onSubmit(formData)
+      await props.onSubmit(validatedData)
     }
 
     submitStatus.value = 'success'
@@ -259,14 +360,31 @@ const handleSubmit = async (event: Event): Promise<void> => {
           Organization Name
           <span class="text-body-small font-normal text-muted ml-1">(Optional)</span>
         </label>
-        <input
-          id="organizationName"
-          v-model="organizationName"
-          name="organizationName"
-          type="text"
-          placeholder="University, Research Lab, Government Agency, or Company"
-          class="input-base"
-        />
+        <div class="relative">
+          <input
+            id="organizationName"
+            v-model="organizationName"
+            name="organizationName"
+            type="text"
+            :placeholder="placeholderOrganizationName"
+            class="input-base overlay-placeholder"
+          />
+          <!-- Placeholder overlay for smooth transitions -->
+          <div
+            v-if="!organizationName"
+            class="absolute inset-0 pointer-events-none flex items-center px-4 overflow-hidden"
+          >
+            <span
+              class="text-body text-placeholder placeholder-overlay-text"
+              :class="{
+                'animate-[var(--animate-fade-out)]': isFadingOutOrg,
+                'animate-[var(--animate-fade-in)]': isFadingInOrg,
+              }"
+            >
+              {{ placeholderOrganizationName }}
+            </span>
+          </div>
+        </div>
         <p class="pt-2 text-body-small text-muted">
           If you don't have one, that's OK! We'll work with you regardless.
         </p>
@@ -297,14 +415,31 @@ const handleSubmit = async (event: Event): Promise<void> => {
           Who can we thank?
           <span class="text-body-small font-normal text-muted ml-1">(Optional)</span>
         </label>
-        <input
-          id="referralSource"
-          v-model="referralSource"
-          name="referralSource"
-          type="text"
-          placeholder="Organization, person, or referral source"
-          class="input-base"
-        />
+        <div class="relative">
+          <input
+            id="referralSource"
+            v-model="referralSource"
+            name="referralSource"
+            type="text"
+            :placeholder="placeholderReferralSource"
+            class="input-base overlay-placeholder"
+          />
+          <!-- Placeholder overlay for smooth transitions -->
+          <div
+            v-if="!referralSource"
+            class="absolute inset-0 pointer-events-none flex items-center px-4 overflow-hidden"
+          >
+            <span
+              class="text-body text-placeholder placeholder-overlay-text"
+              :class="{
+                'animate-[var(--animate-fade-out)]': isFadingOutReferral,
+                'animate-[var(--animate-fade-in)]': isFadingInReferral,
+              }"
+            >
+              {{ placeholderReferralSource }}
+            </span>
+          </div>
+        </div>
         <p class="pt-2 text-body-small text-muted">
           If you found us through an organization, accelerator, university, investor, or friend of
           the startup community, please let us know!

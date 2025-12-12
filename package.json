@@ -24,7 +24,8 @@
     "@unhead/vue": "^2.0.19",
     "pinia": "^3.0.4",
     "vue": "^3.5.25",
-    "vue-router": "^4.6.3"
+    "vue-router": "^4.6.3",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
