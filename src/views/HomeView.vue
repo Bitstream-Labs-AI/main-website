@@ -35,9 +35,9 @@ const handleContactSubmit = async (_data: {
   <div class="bg-page flex flex-col">
     <SiteNavigation />
     <main class="flex-1 relative">
-      <!-- Decorative floating orbs constrained to content width -->
+      <!-- Decorative floating orbs - positioned outside hero section to avoid clipping -->
       <div class="orb-layer" aria-hidden="true">
-        <div class="orb-layer-inner container-content">
+        <div class="orb-layer-inner">
           <div class="orb orb-1"></div>
           <div class="orb orb-2"></div>
           <div class="orb orb-3"></div>
