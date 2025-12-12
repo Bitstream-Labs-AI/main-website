@@ -24,12 +24,37 @@ export default defineConfig(() => {
     ? process.env.VITE_PREVIEW_ALLOWED_HOSTS.split(',').map((host) => host.trim())
     : undefined
 
+  // Also support dev server allowed hosts (for Netlify dev server)
+  // Parse server allowed hosts from environment variable
+  const serverAllowedHostsList = process.env.VITE_SERVER_ALLOWED_HOSTS
+    ? process.env.VITE_SERVER_ALLOWED_HOSTS.split(',').map((host) => host.trim())
+    : undefined
+
+  // Create allowed hosts function for dev server
+  // Allows Netlify dev server hosts by default, plus any explicitly configured hosts
+  const serverAllowedHosts = serverAllowedHostsList
+    ? serverAllowedHostsList
+    : (host: string) => {
+        // Allow Netlify dev server hosts (devserver-*.netlify.app)
+        if (host.includes('.netlify.app')) {
+          return true
+        }
+        // Allow localhost and local IPs
+        if (host === 'localhost' || host.startsWith('127.') || host.startsWith('192.168.')) {
+          return true
+        }
+        return false
+      }
+
   return {
     plugins,
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
+    },
+    server: {
+      allowedHosts: serverAllowedHosts,
     },
     preview: {
       allowedHosts,
