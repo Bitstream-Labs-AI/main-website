@@ -134,7 +134,75 @@ git lfs pull
 - If snapshots show as pointers: `git lfs pull`
 - If not installed: `brew install git-lfs && git lfs install`
 
+## Environment Variables
+
+### Application Configuration
+
+- `VITE_CONTACT_API_URL` - Contact form API endpoint URL
+  - Required for staging/production environments
+  - Set in Netlify dashboard for deployed environments
+  - For local development, create `.env` file with this variable
+
+- `VITE_CONTACT_API_ENABLED` - Enable/disable API calls
+  - Defaults to `true` in production
+  - Automatically set to `false` in unit test environment (see `vitest.config.ts`)
+  - Used to ensure unit tests are no-ops (no actual HTTP requests)
+
+- `VITE_CONTACT_FORM_ENABLED` - Enable/disable contact form feature visibility
+  - Defaults to `false` (disabled) - contact form and navigation link are hidden
+  - Set to `'true'` to enable the contact form feature
+  - Controls both the contact form section and the "Contact" navigation item
+
+### Testing Configuration
+
+- `PLAYWRIGHT_BASE_URL` - Base URL for Playwright e2e tests
+  - Defaults to `http://localhost:5173` (dev) or `http://localhost:4173` (preview)
+  - Set to staging URL in CI to test against live staging environment
+  - When set, Playwright will not start a local web server
+
+### Local Development Setup
+
+Create a `.env` file in the project root:
+
+```env
+VITE_CONTACT_API_URL=https://your-staging-endpoint.com/api/contact
+```
+
+## Deployment
+
+### Staging Deployment
+
+Staging deployment is automated via GitHub Actions:
+
+**Workflow**: `.github/workflows/deploy-staging.yml`
+
+**Process**:
+
+1. **Unit Tests**: Run `pnpm test:unit` with `VITE_CONTACT_API_ENABLED=false`
+2. **Build**: Build application using `pnpm build`
+3. **Deploy**: Deploy to Netlify staging using Netlify CLI
+4. **E2E Tests**: Run Playwright tests against live staging URL
+
+**Configuration**:
+
+- Triggered on push to `develop` branch
+- Requires GitHub secrets: `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID`
+- Staging URL format: `https://develop--<site-id>.netlify.app`
+
+**Netlify Setup**:
+
+1. Create Netlify site (if not already done)
+2. Configure `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` as GitHub secrets
+3. Set `VITE_CONTACT_API_URL` in Netlify dashboard for staging environment
+
+### Testing Strategy
+
+- **Unit Tests (Local)**: Run with `pnpm test:unit`, configured with no-op API behavior
+- **Unit Tests (CI)**: Run in GitHub Actions before build/deploy with `VITE_CONTACT_API_ENABLED=false`
+- **E2E Tests (Local)**: Run against local dev server (default behavior)
+- **E2E Tests (Staging)**: Run automatically in GitHub Actions against live staging environment after deployment
+
 ## Notes
 
-- **CI/CD**: Not configured - local development only
+- **CI/CD**: Configured for staging deployment via GitHub Actions
 - **Vue DevTools**: Automatically disabled when `NODE_ENV=test`

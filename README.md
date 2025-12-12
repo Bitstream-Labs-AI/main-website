@@ -34,7 +34,44 @@ See `package.json` scripts section for all available commands. Common ones:
 
 For development details, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 
+## Environment Variables
+
+### Application Environment Variables
+
+- `VITE_CONTACT_API_URL` - Contact form API endpoint URL (required for staging/production)
+- `VITE_CONTACT_API_ENABLED` - Enable/disable API calls (defaults to true, set to false in tests)
+- `VITE_CONTACT_FORM_ENABLED` - Enable/disable contact form feature visibility (defaults to false, set to 'true' to enable)
+
+### Testing Environment Variables
+
+- `PLAYWRIGHT_BASE_URL` - Base URL for Playwright e2e tests (defaults to localhost, set to staging URL in CI)
+
+For local development, create a `.env` file in the project root:
+
+```env
+VITE_CONTACT_API_URL=https://your-staging-endpoint.com/api/contact
+```
+
+## Deployment
+
+### Staging Deployment
+
+The project uses GitHub Actions for automated staging deployment:
+
+- **Trigger**: Push to `develop` branch
+- **Workflow**: `.github/workflows/deploy-staging.yml`
+- **Process**:
+  1. Run unit tests
+  2. Build application
+  3. Deploy to Netlify staging
+  4. Run Playwright e2e tests against live staging environment
+
+**Required GitHub Secrets**:
+
+- `NETLIFY_AUTH_TOKEN` - Netlify authentication token
+- `NETLIFY_SITE_ID` - Netlify site ID
+
 ## Notes
 
-- **CI/CD**: Not configured - local development only
+- **CI/CD**: Configured for staging deployment via GitHub Actions
 - **Git LFS**: Required for test snapshots (see [DEVELOPMENT.md](./DEVELOPMENT.md))

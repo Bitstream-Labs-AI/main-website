@@ -2,6 +2,9 @@
 import { useHead } from '@unhead/vue'
 import ContactForm from '@/components/ContactForm.vue'
 import SiteNavigation from '@/components/SiteNavigation.vue'
+import { submitContactForm } from '@/services/contactFormService'
+import type { ContactFormData } from '@/schemas/contact-form'
+import { isContactFormEnabled } from '@/utils/featureFlags'
 
 useHead({
   title: 'Bitstream Labs.AI - AI Benchmarking Experts',
@@ -14,20 +17,8 @@ useHead({
   ],
 })
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const handleContactSubmit = async (_data: {
-  name: string
-  email: string
-  organizationName?: string
-  organizationDescription?: string
-  referralSource?: string
-  message: string
-}): Promise<void> => {
-  // Placeholder for contact form submission
-  // In production, this would send data to an API or email service
-
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 500))
+const handleContactSubmit = async (data: ContactFormData): Promise<void> => {
+  await submitContactForm(data)
 }
 </script>
 
@@ -93,7 +84,7 @@ const handleContactSubmit = async (_data: {
         </section>
 
         <!-- Contact Form -->
-        <div class="container-content">
+        <div v-if="isContactFormEnabled()" class="container-content">
           <section id="contact" class="section">
             <div class="mx-auto w-full">
               <ContactForm :on-submit="handleContactSubmit" />
