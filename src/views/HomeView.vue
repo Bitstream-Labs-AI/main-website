@@ -71,7 +71,7 @@ const handleContactSubmit = async (_data: {
                 <div class="card">
                   <p class="text-body-large text-primary leading-relaxed text-center md:text-left">
                     <strong class="heading-cyan">We set the standard in AI benchmarking</strong> by
-                    providing expert consulting to R&D teams pushing the boundaries of intelligent
+                    providing expert consulting to teams pushing the boundaries of intelligent
                     hardware.
                   </p>
                 </div>
