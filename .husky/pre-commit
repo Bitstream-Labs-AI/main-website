@@ -1,3 +1,18 @@
+# Get list of staged PNG files
+STAGED_PNG_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.png$' || true)
+
+if [ -n "$STAGED_PNG_FILES" ]; then
+  echo "🖼️  Optimizing PNG images with oxipng..."
+  echo "$STAGED_PNG_FILES" | while read -r file; do
+    if [ -f "$file" ]; then
+      oxipng -o 4 --strip safe --alpha "$file" 2>/dev/null || true
+    fi
+  done
+
+  echo "📦 Staging optimized PNG files..."
+  echo "$STAGED_PNG_FILES" | xargs git add || true
+fi
+
 # Get list of staged files that match our file patterns
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx|ts|tsx|vue|css|scss|json|md)$' || true)
 
