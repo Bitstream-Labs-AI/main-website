@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { prepareForSnapshot, getViewportType } from './helpers'
 
 test.describe('Contact Form', () => {
   test('form can be filled out', async ({ page }) => {
@@ -113,18 +114,14 @@ test.describe('Contact Form', () => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
 
+    await prepareForSnapshot(page)
+
     // Scroll to contact form section
     const contactSection = page.locator('section#contact')
     await contactSection.scrollIntoViewIfNeeded()
     await page.waitForTimeout(500) // Wait for any animations
 
-    const projectName = test.info().project.name || 'unknown'
-    const viewportType = projectName.includes('mobile')
-      ? 'mobile'
-      : projectName.includes('tablet')
-        ? 'tablet'
-        : 'desktop'
-
+    const viewportType = getViewportType(test.info().project.name)
     const form = page.locator('form').first()
     await expect(form).toHaveScreenshot(`contact-form-${viewportType}.png`)
   })
@@ -132,6 +129,8 @@ test.describe('Contact Form', () => {
   test('contact form with validation errors visual snapshot', async ({ page }) => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
+
+    await prepareForSnapshot(page)
 
     const contactSection = page.locator('section#contact')
     await contactSection.scrollIntoViewIfNeeded()
@@ -143,13 +142,7 @@ test.describe('Contact Form', () => {
     await expect(page.getByText(/name is required/i)).toBeVisible()
     await page.waitForTimeout(300) // Wait for error display
 
-    const projectName = test.info().project.name || 'unknown'
-    const viewportType = projectName.includes('mobile')
-      ? 'mobile'
-      : projectName.includes('tablet')
-        ? 'tablet'
-        : 'desktop'
-
+    const viewportType = getViewportType(test.info().project.name)
     const form = page.locator('form').first()
     await expect(form).toHaveScreenshot(`contact-form-validation-errors-${viewportType}.png`)
   })
@@ -157,6 +150,8 @@ test.describe('Contact Form', () => {
   test('contact form with filled data visual snapshot', async ({ page }) => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
+
+    await prepareForSnapshot(page)
 
     const contactSection = page.locator('section#contact')
     await contactSection.scrollIntoViewIfNeeded()
@@ -171,13 +166,7 @@ test.describe('Contact Form', () => {
     await messageInput.fill('This is a test message')
     await page.waitForTimeout(300)
 
-    const projectName = test.info().project.name || 'unknown'
-    const viewportType = projectName.includes('mobile')
-      ? 'mobile'
-      : projectName.includes('tablet')
-        ? 'tablet'
-        : 'desktop'
-
+    const viewportType = getViewportType(test.info().project.name)
     const form = page.locator('form').first()
     await expect(form).toHaveScreenshot(`contact-form-filled-${viewportType}.png`)
   })

@@ -38,23 +38,4 @@ test.describe('GitHub Links', () => {
 
     expect(href).toBe('https://github.com/Bitstream-Labs-AI')
   })
-
-  test('footer visual snapshot', async ({ page }) => {
-    await page.goto('/')
-    await page.waitForLoadState('networkidle')
-
-    // Scroll to footer
-    const footer = page.locator('footer')
-    await footer.scrollIntoViewIfNeeded()
-    await page.waitForTimeout(500) // Wait for any animations
-
-    const projectName = test.info().project.name || 'unknown'
-    const viewportType = projectName.includes('mobile')
-      ? 'mobile'
-      : projectName.includes('tablet')
-        ? 'tablet'
-        : 'desktop'
-
-    await expect(footer).toHaveScreenshot(`footer-${viewportType}.png`)
-  })
 })

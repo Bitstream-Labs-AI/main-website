@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { z } from 'zod'
-
-export interface ContactFormData {
-  name: string
-  email: string
-  organizationName?: string
-  organizationDescription?: string
-  referralSource?: string
-  message: string
-}
+import {
+  contactFormSchema,
+  type ContactFormData,
+  CONTACT_FORM_MAX_LENGTHS,
+} from '../schemas/contact-form'
 
 interface Props {
   onSubmit?: (data: ContactFormData) => Promise<void> | void
@@ -167,32 +162,7 @@ const errors = ref<Partial<Record<keyof ContactFormData, string>>>({})
 const isSubmitting = ref(false)
 const submitStatus = ref<'idle' | 'success' | 'error'>('idle')
 
-// ZOD schema for form validation
-const contactFormSchema = z.object({
-  name: z.string().trim().min(1, 'Name is required'),
-  email: z
-    .string()
-    .trim()
-    .superRefine((val, ctx) => {
-      if (!val || val.length === 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Email is required',
-        })
-        return
-      }
-      if (!z.string().email().safeParse(val).success) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Please enter a valid email address',
-        })
-      }
-    }),
-  organizationName: z.string().trim().optional(),
-  organizationDescription: z.string().trim().optional(),
-  referralSource: z.string().trim().optional(),
-  message: z.string().trim().min(1, 'Message is required'),
-})
+// Schema is imported from shared location for consistency with backend
 
 const validate = (formData: Partial<ContactFormData>): boolean => {
   errors.value = {}
@@ -220,23 +190,30 @@ const handleSubmit = async (event: Event): Promise<void> => {
   // Clear previous errors
   errors.value = {}
 
-  // Build form data object with trimmed values
+  // Build form data object with trimmed and clamped values
+  // Clamp to max lengths to prevent oversized data from reaching the backend
   const formData: Partial<ContactFormData> = {
-    name: name.value.trim(),
-    email: email.value.trim(),
-    message: message.value.trim(),
+    name: name.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.name),
+    email: email.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.email),
+    message: message.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.message),
   }
 
   if (organizationName.value.trim()) {
-    formData.organizationName = organizationName.value.trim()
+    formData.organizationName = organizationName.value
+      .trim()
+      .slice(0, CONTACT_FORM_MAX_LENGTHS.organizationName)
   }
 
   if (organizationDescription.value.trim()) {
-    formData.organizationDescription = organizationDescription.value.trim()
+    formData.organizationDescription = organizationDescription.value
+      .trim()
+      .slice(0, CONTACT_FORM_MAX_LENGTHS.organizationDescription)
   }
 
   if (referralSource.value.trim()) {
-    formData.referralSource = referralSource.value.trim()
+    formData.referralSource = referralSource.value
+      .trim()
+      .slice(0, CONTACT_FORM_MAX_LENGTHS.referralSource)
   }
 
   // Validate using ZOD schema
@@ -295,6 +272,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
             v-model="name"
             name="name"
             type="text"
+            :maxlength="CONTACT_FORM_MAX_LENGTHS.name"
             :placeholder="placeholderName"
             class="input-base overlay-placeholder"
             :class="{ error: errors.name }"
@@ -329,6 +307,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
             v-model="email"
             name="email"
             type="email"
+            :maxlength="CONTACT_FORM_MAX_LENGTHS.email"
             :placeholder="placeholderEmail"
             class="input-base overlay-placeholder"
             :class="{ error: errors.email }"
@@ -366,6 +345,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
             v-model="organizationName"
             name="organizationName"
             type="text"
+            :maxlength="CONTACT_FORM_MAX_LENGTHS.organizationName"
             :placeholder="placeholderOrganizationName"
             class="input-base overlay-placeholder"
           />
@@ -401,6 +381,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
           v-model="organizationDescription"
           name="organizationDescription"
           rows="4"
+          :maxlength="CONTACT_FORM_MAX_LENGTHS.organizationDescription"
           placeholder="Briefly describe your organization, research focus, or services..."
           class="input-base resize-vertical"
         ></textarea>
@@ -421,6 +402,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
             v-model="referralSource"
             name="referralSource"
             type="text"
+            :maxlength="CONTACT_FORM_MAX_LENGTHS.referralSource"
             :placeholder="placeholderReferralSource"
             class="input-base overlay-placeholder"
           />
@@ -456,6 +438,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
           v-model="message"
           name="message"
           rows="6"
+          :maxlength="CONTACT_FORM_MAX_LENGTHS.message"
           placeholder="Tell us about your AI benchmarking or hardware consulting needs..."
           class="input-base resize-vertical"
           :class="{ error: errors.message }"

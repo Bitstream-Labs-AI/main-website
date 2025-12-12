@@ -1,14 +1,7 @@
 // Test data factories
 // Use factory functions with optional overrides for consistent test data
 
-export interface ContactFormData {
-  name: string
-  email: string
-  organizationName?: string
-  organizationDescription?: string
-  referralSource?: string
-  message: string
-}
+import { type ContactFormData } from '../schemas/contact-form'
 
 export function createMockContactFormData(overrides?: Partial<ContactFormData>): ContactFormData {
   return {

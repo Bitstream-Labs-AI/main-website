@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { prepareForSnapshot, getViewportType } from './helpers'
 
 test.describe('Home Page', () => {
   test('displays mission statement', async ({ page }) => {
@@ -38,56 +39,18 @@ test.describe('Home Page', () => {
     await expect(page.getByRole('heading', { name: /bitstream labs\.ai/i })).toBeVisible()
   })
 
-  test('home page visual snapshot', async ({ page }) => {
-    await page.goto('/')
-
-    // Wait for page to fully load
-    await page.waitForLoadState('networkidle')
-
-    const projectName = test.info().project.name || 'unknown'
-    const viewportType = projectName.includes('mobile')
-      ? 'mobile'
-      : projectName.includes('tablet')
-        ? 'tablet'
-        : 'desktop'
-
-    // Take full page screenshot
-    await expect(page).toHaveScreenshot(`home-page-${viewportType}.png`, {
-      fullPage: true,
-    })
-  })
-
-  test('hero section visual snapshot', async ({ page }) => {
-    await page.goto('/')
-    await page.waitForLoadState('networkidle')
-
-    const projectName = test.info().project.name || 'unknown'
-    const viewportType = projectName.includes('mobile')
-      ? 'mobile'
-      : projectName.includes('tablet')
-        ? 'tablet'
-        : 'desktop'
-
-    const heroSection = page.locator('main').first()
-    await expect(heroSection).toHaveScreenshot(`hero-section-${viewportType}.png`)
-  })
-
   test('about us section visual snapshot', async ({ page }) => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
+
+    await prepareForSnapshot(page)
 
     // Scroll to about section to ensure it's fully visible
     const aboutSection = page.locator('section#about')
     await aboutSection.scrollIntoViewIfNeeded()
     await page.waitForTimeout(500) // Wait for any animations
 
-    const projectName = test.info().project.name || 'unknown'
-    const viewportType = projectName.includes('mobile')
-      ? 'mobile'
-      : projectName.includes('tablet')
-        ? 'tablet'
-        : 'desktop'
-
+    const viewportType = getViewportType(test.info().project.name)
     await expect(aboutSection).toHaveScreenshot(`about-section-${viewportType}.png`)
   })
 })

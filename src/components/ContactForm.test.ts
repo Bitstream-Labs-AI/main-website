@@ -24,12 +24,21 @@ describe('ContactForm', () => {
 
   it('displays validation error when email is empty', async () => {
     const wrapper = mount(ContactForm)
-    const formData = createMockContactFormData({ email: '' })
+    const formData = createMockContactFormData()
 
     const nameInput = wrapper.find('input[name="name"]')
+    const emailInput = wrapper.find('input[name="email"]')
+
     await nameInput.setValue(formData.name)
 
+    // Clear email by setting the input element's value directly and triggering input event
+    const emailElement = emailInput.element as HTMLInputElement
+    emailElement.value = ''
+    await emailInput.trigger('input')
+    await wrapper.vm.$nextTick()
+
     await wrapper.find('form').trigger('submit')
+    await wrapper.vm.$nextTick()
 
     expect(wrapper.text()).toContain('Email is required')
   })
