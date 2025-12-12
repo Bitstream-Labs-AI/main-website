@@ -1,13 +1,24 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { isContactFormEnabled } from '@/utils/featureFlags'
 
 // Navigation items data structure
-const navItems = [
+const allNavItems = [
   { id: 'home', label: 'Home', sectionId: 'hero' },
   { id: 'about', label: 'About Us', sectionId: 'about' },
   { id: 'contact', label: 'Contact', sectionId: 'contact' },
 ]
+
+// Filter navigation items based on feature flags
+const navItems = computed(() => {
+  return allNavItems.filter((item) => {
+    if (item.id === 'contact') {
+      return isContactFormEnabled()
+    }
+    return true
+  })
+})
 
 const scrollToSection = (sectionId: string) => {
   // Close menu first to restore scroll capability (important for iOS)
@@ -69,7 +80,7 @@ const handleScroll = () => {
 
 // Scroll-based section detection
 const updateActiveSection = () => {
-  const sections = ['hero', 'about', 'contact']
+  const sections = ['hero', 'about', ...(isContactFormEnabled() ? ['contact'] : [])]
   const navHeight = 80
   const scrollPosition = window.scrollY + navHeight + 100 // Add offset for better detection
 

@@ -42,7 +42,11 @@ export default defineConfig({
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173',
+    /* If PLAYWRIGHT_BASE_URL is set, use it (for staging/production testing) */
+    /* Otherwise, use localhost based on CI environment */
+    baseURL:
+      process.env.PLAYWRIGHT_BASE_URL ||
+      (process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173'),
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -110,18 +114,24 @@ export default defineConfig({
   snapshotPathTemplate: '{testDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}',
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    /**
-     * Use the dev server by default for faster feedback loop.
-     * Use the preview server on CI for more realistic testing.
-     * Playwright will re-use the local server if there is already a dev-server running.
-     */
-    command: process.env.CI === 'true' ? 'pnpm preview' : 'pnpm dev',
-    port: process.env.CI === 'true' ? 4173 : 5173,
-    reuseExistingServer: process.env.CI !== 'true',
-    timeout: 120 * 1000,
-    env: {
-      NODE_ENV: 'test',
-    },
-  },
+  /* Only start webServer if PLAYWRIGHT_BASE_URL is not set (testing against external URL) */
+  ...(process.env.PLAYWRIGHT_BASE_URL
+    ? {}
+    : {
+        webServer: {
+          /**
+           * Use the dev server by default for faster feedback loop.
+           * Use the preview server on CI for more realistic testing.
+           * Playwright will re-use the local server if there is already a dev-server running.
+           */
+          command: process.env.CI === 'true' ? 'pnpm preview' : 'pnpm dev',
+          port: process.env.CI === 'true' ? 4173 : 5173,
+          reuseExistingServer: process.env.CI !== 'true',
+          timeout: 120 * 1000,
+          env: {
+            NODE_ENV: 'test',
+            VITE_CONTACT_FORM_ENABLED: 'true',
+          },
+        },
+      }),
 })

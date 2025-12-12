@@ -19,5 +19,8 @@ export default defineConfig({
     exclude: [...configDefaults.exclude, 'e2e/**', 'tests/e2e/**'],
     root: fileURLToPath(new URL('./', import.meta.url)),
     setupFiles: ['./src/test-utils/setup.ts'],
+    env: {
+      VITE_CONTACT_API_ENABLED: 'false',
+    },
   },
 })
