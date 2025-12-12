@@ -91,8 +91,6 @@ No new data models required.
 
 4. **GitHub Pages Only**: Considered but rejected because it may have limitations for custom domains and advanced features. However, it could be a viable option if simplicity is prioritized.
 
-5. **Docker Container Deployment**: Rejected because static sites don't benefit from containerization, and it adds unnecessary complexity.
-
 ## 5. Out of Scope
 
 - Multi-environment setup (staging, production) - can be added later
