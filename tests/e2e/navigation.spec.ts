@@ -55,4 +55,158 @@ test.describe('Navigation', () => {
     const heroHeading = page.getByRole('heading', { name: /bitstream labs\.ai/i })
     await expect(heroHeading).toBeVisible()
   })
+
+  test.describe('Mobile Navigation Menu', () => {
+    test.use({ viewport: { width: 375, height: 667 } }) // iPhone SE size
+
+    test('mobile menu closed state snapshot', async ({ page }) => {
+      await page.goto('/')
+      await page.waitForLoadState('networkidle')
+
+      const nav = page.locator('nav')
+      await expect(nav).toHaveScreenshot('mobile-menu-closed.png')
+    })
+
+    test('mobile menu open state snapshot', async ({ page }) => {
+      await page.goto('/')
+      await page.waitForLoadState('networkidle')
+
+      // Open menu
+      const hamburgerButton = page.getByRole('button', { name: /open menu/i })
+      await hamburgerButton.click()
+      await page.waitForTimeout(300) // Wait for animation
+
+      // Take snapshot of the entire page with menu open
+      await expect(page).toHaveScreenshot('mobile-menu-open.png', {
+        fullPage: true,
+      })
+    })
+
+    test('hamburger button is visible on mobile', async ({ page }) => {
+      await page.goto('/')
+      await page.waitForLoadState('networkidle')
+
+      // Hamburger button should be visible
+      const hamburgerButton = page.getByRole('button', { name: /open menu/i })
+      await expect(hamburgerButton).toBeVisible()
+
+      // Desktop menu should be hidden
+      const desktopMenu = page.locator('nav ul').first()
+      await expect(desktopMenu).not.toBeVisible()
+    })
+
+    test('menu opens when hamburger is clicked', async ({ page }) => {
+      await page.goto('/')
+      await page.waitForLoadState('networkidle')
+
+      const hamburgerButton = page.getByRole('button', { name: /open menu/i })
+      await hamburgerButton.click()
+
+      // Wait for drawer to appear
+      await page.waitForTimeout(300)
+
+      // Drawer should be visible
+      const drawer = page.locator('[aria-hidden="false"]').filter({ hasText: /menu/i }).first()
+      await expect(drawer).toBeVisible()
+
+      // All navigation items should be visible in drawer
+      await expect(page.getByRole('button', { name: /home/i })).toBeVisible()
+      await expect(page.getByRole('button', { name: /about us/i })).toBeVisible()
+      await expect(page.getByRole('button', { name: /contact/i })).toBeVisible()
+    })
+
+    test('menu closes when X button is clicked', async ({ page }) => {
+      await page.goto('/')
+      await page.waitForLoadState('networkidle')
+
+      // Open menu
+      const hamburgerButton = page.getByRole('button', { name: /open menu/i })
+      await hamburgerButton.click()
+      await page.waitForTimeout(300)
+
+      // Close button should be visible - scope to drawer container
+      const drawer = page.locator('[aria-hidden="false"]').filter({ hasText: /menu/i }).first()
+      const closeButton = drawer.getByRole('button', { name: /close menu/i })
+      await expect(closeButton).toBeVisible()
+
+      // Click close button
+      await closeButton.click()
+      await page.waitForTimeout(300)
+
+      // Drawer should be closed
+      await expect(drawer).not.toBeVisible()
+    })
+
+    test('menu closes when backdrop is clicked', async ({ page }) => {
+      await page.goto('/')
+      await page.waitForLoadState('networkidle')
+
+      // Open menu
+      const hamburgerButton = page.getByRole('button', { name: /open menu/i })
+      await hamburgerButton.click()
+      await page.waitForTimeout(300)
+
+      // Click on backdrop (the dark overlay)
+      const backdrop = page.locator('.fixed.inset-0.bg-black\\/50')
+      await backdrop.click({ position: { x: 50, y: 50 } })
+      await page.waitForTimeout(300)
+
+      // Drawer should be closed
+      const drawer = page.locator('[aria-hidden="false"]').filter({ hasText: /menu/i }).first()
+      await expect(drawer).not.toBeVisible()
+    })
+
+    test('menu closes when navigation link is clicked', async ({ page }) => {
+      await page.goto('/')
+      await page.waitForLoadState('networkidle')
+
+      // Open menu
+      const hamburgerButton = page.getByRole('button', { name: /open menu/i })
+      await hamburgerButton.click()
+      await page.waitForTimeout(300)
+
+      // Click a navigation link
+      const aboutButton = page.getByRole('button', { name: /about us/i })
+      await aboutButton.click()
+      await page.waitForTimeout(800) // Wait for scroll and menu close
+
+      // Drawer should be closed
+      const drawer = page.locator('[aria-hidden="false"]').filter({ hasText: /menu/i }).first()
+      await expect(drawer).not.toBeVisible()
+
+      // Should have scrolled to about section
+      const missionHeading = page.getByRole('heading', { name: /our mission/i })
+      await expect(missionHeading).toBeVisible()
+    })
+
+    test('navigation works on mobile viewport', async ({ page }) => {
+      await page.goto('/')
+      await page.waitForLoadState('networkidle')
+
+      // Open menu
+      const hamburgerButton = page.getByRole('button', { name: /open menu/i })
+      await hamburgerButton.click()
+      await page.waitForTimeout(300)
+
+      // Navigate to About section
+      await page.getByRole('button', { name: /about us/i }).click()
+      await page.waitForTimeout(800)
+
+      // Verify we're at about section
+      const missionHeading = page.getByRole('heading', { name: /our mission/i })
+      await expect(missionHeading).toBeVisible()
+
+      // Open menu again
+      await hamburgerButton.click()
+      await page.waitForTimeout(300)
+
+      // Navigate to Contact section
+      await page.getByRole('button', { name: /contact/i }).click()
+      await page.waitForTimeout(800)
+
+      // Verify we're at contact section
+      const contactHeading = page.getByRole('heading', { name: /let's talk/i })
+      await expect(contactHeading).toBeVisible()
+    })
+  })
 })

@@ -1,31 +1,67 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
+
+// Navigation items data structure
+const navItems = [
+  { id: 'home', label: 'Home', sectionId: 'hero' },
+  { id: 'about', label: 'About Us', sectionId: 'about' },
+  { id: 'contact', label: 'Contact', sectionId: 'contact' },
+]
 
 const scrollToSection = (sectionId: string) => {
-  // Special case: scroll to top for 'hero'
-  if (sectionId === 'hero') {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    })
-    return
-  }
+  // Close menu first to restore scroll capability (important for iOS)
+  closeMenu()
 
-  const element = document.getElementById(sectionId)
-  if (element) {
-    const navHeight = 80
-    const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-    const offsetPosition = elementPosition - navHeight
+  // Wait for menu to close and scroll to be restored
+  setTimeout(() => {
+    // Special case: scroll to top for 'hero'
+    if (sectionId === 'hero') {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+      return
+    }
 
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: 'smooth',
-    })
-  }
+    const element = document.getElementById(sectionId)
+    if (element) {
+      const navHeight = 80
+      // Get accurate position accounting for current scroll
+      const rect = element.getBoundingClientRect()
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      const elementTop = rect.top + scrollTop
+      const offsetPosition = elementTop - navHeight
+
+      // Use window.scrollTo for better iOS compatibility
+      window.scrollTo({
+        top: Math.max(0, offsetPosition),
+        behavior: 'smooth',
+      })
+    }
+  }, 100) // Small delay to ensure menu is closed and scroll is restored
 }
 
 const isScrolled = ref(false)
 const activeSection = ref<string>('hero')
+const isMenuOpen = ref(false)
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value
+}
+
+const closeMenu = () => {
+  isMenuOpen.value = false
+}
+
+// Body scroll lock when menu is open
+watch(isMenuOpen, (open) => {
+  if (open) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
+  }
+})
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 50
@@ -73,14 +109,18 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('scroll', updateActiveSection)
+  // Cleanup: restore body scroll if menu was open
+  document.body.style.overflow = ''
 })
 </script>
 
 <template>
   <nav
     :class="[
-      'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-      isScrolled ? 'nav-backdrop border-b border-industrial-steel shadow-lg' : 'bg-transparent',
+      'fixed top-0 left-0 right-0 z-[10000] transition-all duration-300',
+      isScrolled || isMenuOpen
+        ? 'nav-backdrop border-b border-industrial-steel shadow-lg'
+        : 'bg-transparent',
     ]"
   >
     <div class="container-content py-4">
@@ -91,48 +131,87 @@ onUnmounted(() => {
         >
           Bitstream Labs.AI
         </div>
-        <ul class="flex items-center gap-6 list-none m-0 p-0">
-          <li>
+        <!-- Desktop Menu -->
+        <ul class="hidden md:flex items-center gap-6 list-none m-0 p-0">
+          <li v-for="item in navItems" :key="item.id">
             <button
-              @click="scrollToSection('hero')"
+              @click="scrollToSection(item.sectionId)"
               :class="[
                 'px-3 py-2 text-sm font-medium transition-colors bg-transparent border-none cursor-pointer',
-                activeSection === 'hero'
+                activeSection === item.sectionId
                   ? 'text-futurist-cyan border-b-2 border-futurist-cyan'
                   : 'text-primary hover:text-futurist-cyan',
               ]"
             >
-              Home
-            </button>
-          </li>
-          <li>
-            <button
-              @click="scrollToSection('about')"
-              :class="[
-                'px-3 py-2 text-sm font-medium transition-colors bg-transparent border-none cursor-pointer',
-                activeSection === 'about'
-                  ? 'text-futurist-cyan border-b-2 border-futurist-cyan'
-                  : 'text-primary hover:text-futurist-cyan',
-              ]"
-            >
-              About Us
-            </button>
-          </li>
-          <li>
-            <button
-              @click="scrollToSection('contact')"
-              :class="[
-                'px-3 py-2 text-sm font-medium transition-colors bg-transparent border-none cursor-pointer',
-                activeSection === 'contact'
-                  ? 'text-futurist-cyan border-b-2 border-futurist-cyan'
-                  : 'text-primary hover:text-futurist-cyan',
-              ]"
-            >
-              Contact
+              {{ item.label }}
             </button>
           </li>
         </ul>
+        <!-- Mobile Menu Toggle Button (Hamburger when closed, X when open) -->
+        <button
+          @click="toggleMenu"
+          class="md:hidden p-2 text-primary hover:text-futurist-cyan transition-colors bg-transparent border-none cursor-pointer"
+          :aria-label="isMenuOpen ? 'Close menu' : 'Open menu'"
+          :aria-expanded="isMenuOpen"
+        >
+          <Bars3Icon v-if="!isMenuOpen" class="w-6 h-6" />
+          <XMarkIcon v-else class="w-6 h-6" />
+        </button>
       </div>
     </div>
+    <!-- Mobile Menu - Full Screen Overlay -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-transform duration-500 ease-out"
+        leave-active-class="transition-transform duration-300 ease-in"
+        enter-from-class="-translate-y-full"
+        enter-to-class="translate-y-0"
+        leave-from-class="translate-y-0"
+        leave-to-class="-translate-y-full"
+      >
+        <div
+          v-if="isMenuOpen"
+          class="fixed inset-0 z-[9999] md:hidden isolate"
+          :aria-hidden="!isMenuOpen"
+        >
+          <!-- Fully opaque background layer -->
+          <div class="absolute inset-0 bg-industrial-dark"></div>
+          <!-- Menu content with glass blur effect -->
+          <div class="absolute inset-0 nav-backdrop flex flex-col overflow-hidden">
+            <!-- Left-aligned Navigation Items - Scrollable -->
+            <nav class="px-4 pt-20 relative flex-1 overflow-y-auto z-10 pointer-events-auto">
+              <ul class="flex flex-col gap-3 list-none m-0 p-0 relative z-10 pb-4">
+                <TransitionGroup
+                  enter-active-class="transition-all duration-500 ease-out"
+                  leave-active-class="transition-all duration-200 ease-in"
+                  enter-from-class="opacity-0 -translate-y-4"
+                  enter-to-class="opacity-100 translate-y-0"
+                  leave-from-class="opacity-100 translate-y-0"
+                  leave-to-class="opacity-0 -translate-y-4"
+                >
+                  <li
+                    v-for="(item, index) in navItems"
+                    :key="item.id"
+                    :style="{ transitionDelay: `${index * 100}ms` }"
+                  >
+                    <button
+                      @click="scrollToSection(item.sectionId)"
+                      :class="[
+                        'text-left px-4 py-2 text-xl font-medium transition-colors bg-transparent border-none cursor-pointer rounded',
+                        activeSection === item.sectionId
+                          ? 'text-futurist-cyan'
+                          : 'text-primary hover:text-futurist-cyan',
+                      ]"
+                    >
+                      {{ item.label }}
+                    </button>
+                  </li>
+                </TransitionGroup>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </nav>
 </template>

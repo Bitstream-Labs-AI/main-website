@@ -34,42 +34,33 @@ const handleContactSubmit = async (_data: {
 <template>
   <div class="bg-page flex flex-col">
     <SiteNavigation />
-    <main class="flex-1">
+    <main class="flex-1 relative">
+      <!-- Floating Orbs Background - Positioned relative to main to bleed into next section -->
+      <div
+        class="absolute top-20 left-10 w-96 h-96 rounded-full filter blur-3xl opacity-50 animate-blob pointer-events-none z-0"
+        style="
+          background: radial-gradient(
+            circle,
+            rgba(124, 58, 237, 0.8) 0%,
+            rgba(124, 58, 237, 0) 70%
+          );
+        "
+      ></div>
+      <div
+        class="absolute top-32 right-10 w-96 h-96 rounded-full filter blur-3xl opacity-50 animate-blob animation-delay-2000 pointer-events-none z-0"
+        style="
+          background: radial-gradient(circle, rgba(0, 217, 255, 0.8) 0%, rgba(0, 217, 255, 0) 70%);
+        "
+      ></div>
+      <div
+        class="absolute bottom-20 left-1/4 w-96 h-96 rounded-full filter blur-3xl opacity-50 animate-blob animation-delay-4000 pointer-events-none z-0"
+        style="
+          background: radial-gradient(circle, rgba(0, 102, 255, 0.8) 0%, rgba(0, 102, 255, 0) 70%);
+        "
+      ></div>
+
       <!-- Hero Section - Full width -->
       <section id="hero" class="hero-section">
-        <!-- Floating Orbs Background -->
-        <div
-          class="absolute top-20 left-10 w-96 h-96 rounded-full filter blur-3xl opacity-50 animate-blob pointer-events-none z-0"
-          style="
-            background: radial-gradient(
-              circle,
-              rgba(124, 58, 237, 0.8) 0%,
-              rgba(124, 58, 237, 0) 70%
-            );
-          "
-        ></div>
-        <div
-          class="absolute top-32 right-10 w-96 h-96 rounded-full filter blur-3xl opacity-50 animate-blob animation-delay-2000 pointer-events-none z-0"
-          style="
-            background: radial-gradient(
-              circle,
-              rgba(0, 217, 255, 0.8) 0%,
-              rgba(0, 217, 255, 0) 70%
-            );
-          "
-        ></div>
-        <div
-          class="absolute bottom-20 left-1/4 w-96 h-96 rounded-full filter blur-3xl opacity-50 animate-blob animation-delay-4000 pointer-events-none z-0"
-          style="
-            background: radial-gradient(
-              circle,
-              rgba(0, 102, 255, 0.8) 0%,
-              rgba(0, 102, 255, 0) 70%
-            );
-          "
-        ></div>
-
-        <!-- Content -->
         <div class="container-content relative z-10">
           <div class="w-full mx-auto">
             <h1 class="text-display gradient-text-primary">Bitstream Labs.AI</h1>

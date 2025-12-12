@@ -97,6 +97,30 @@
   /* 8px */
   --radius-lg: 0.75rem;
   /* 12px */
+
+  /* Placeholder fade animations */
+  --animate-fade-out: fade-out 0.4s ease-out;
+  --animate-fade-in: fade-in 0.4s ease-in;
+
+  @keyframes fade-out {
+    0% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
 }
 
 /* Utility Classes for Brand Patterns */
@@ -161,8 +185,8 @@
 
 /* Navigation Styles - Glass Morphism Effect */
 .nav-backdrop {
-  background-color: rgba(10, 14, 26, 0.7);
-  /* More transparent for glass effect */
+  background-color: rgba(10, 14, 26, 0.85);
+  /* More opaque for better glass effect */
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 1px solid rgba(45, 52, 71, 0.3);
@@ -201,8 +225,6 @@
   /* Only hide horizontal overflow */
   overflow-y: visible;
   /* Allow vertical overflow for orbs */
-  background-color: #0a0e1a;
-  /* Ensure background is set */
 }
 
 /* Floating Orbs Animation */
@@ -414,35 +436,10 @@
   font-smooth: always;
   -webkit-text-stroke: 0.01em transparent;
   transition: all 0.3s ease;
-}
-
-/* Fade transitions for placeholder text changes */
-@keyframes fade-out {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-.placeholder-fade-out {
-  animation: fade-out 0.4s ease-out;
-}
-
-.placeholder-fade-in {
-  animation: fade-in 0.4s ease-in;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .input-base.error {

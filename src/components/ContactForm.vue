@@ -30,8 +30,8 @@ const placeholderNames = [
   { name: 'Quinn Williams', email: 'quinn.williams@example.com' },
 ]
 
-const placeholderName = ref(placeholderNames[0].name)
-const placeholderEmail = ref(placeholderNames[0].email)
+const placeholderName = ref(placeholderNames[0]?.name ?? '')
+const placeholderEmail = ref(placeholderNames[0]?.email ?? '')
 const isFadingOut = ref(false)
 const isFadingIn = ref(false)
 let currentIndex = 0
@@ -45,8 +45,11 @@ const rotatePlaceholder = (): void => {
   // After fade out completes, update text and fade in
   setTimeout(() => {
     currentIndex = (currentIndex + 1) % placeholderNames.length
-    placeholderName.value = placeholderNames[currentIndex].name
-    placeholderEmail.value = placeholderNames[currentIndex].email
+    const currentPlaceholder = placeholderNames[currentIndex]
+    if (currentPlaceholder) {
+      placeholderName.value = currentPlaceholder.name
+      placeholderEmail.value = currentPlaceholder.email
+    }
     isFadingOut.value = false
     isFadingIn.value = true
   }, 400) // Fade out duration
@@ -61,8 +64,11 @@ const rotatePlaceholder = (): void => {
 onMounted(() => {
   // Randomly select initial placeholder
   currentIndex = Math.floor(Math.random() * placeholderNames.length)
-  placeholderName.value = placeholderNames[currentIndex].name
-  placeholderEmail.value = placeholderNames[currentIndex].email
+  const currentPlaceholder = placeholderNames[currentIndex]
+  if (currentPlaceholder) {
+    placeholderName.value = currentPlaceholder.name
+    placeholderEmail.value = currentPlaceholder.email
+  }
 
   // Start rotating every 5 seconds
   rotationInterval = setInterval(rotatePlaceholder, 5000)
@@ -181,7 +187,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
     <form @submit="handleSubmit" class="card">
       <!-- Name Field -->
       <div class="pb-4">
-        <label for="name" class="block text-body font-medium text-primary mb-3"> Your Name </label>
+        <label for="name" class="block text-body font-black text-primary pb-2"> Your Name </label>
         <div class="relative">
           <input
             id="name"
@@ -193,25 +199,29 @@ const handleSubmit = async (event: Event): Promise<void> => {
             :class="{ error: errors.name }"
           />
           <!-- Placeholder overlay for smooth transitions -->
-          <div v-if="!name" class="absolute inset-0 pointer-events-none flex items-center px-4">
+          <div
+            v-if="!name"
+            class="absolute inset-0 pointer-events-none flex items-center px-4 overflow-hidden"
+          >
             <span
               class="text-body text-placeholder placeholder-overlay-text"
-              :class="{ 'placeholder-fade-out': isFadingOut, 'placeholder-fade-in': isFadingIn }"
+              :class="{
+                'animate-[var(--animate-fade-out)]': isFadingOut,
+                'animate-[var(--animate-fade-in)]': isFadingIn,
+              }"
             >
               {{ placeholderName }}
             </span>
           </div>
         </div>
-        <p v-if="errors.name" class="mt-3 text-body-small text-red-400" role="alert">
+        <p v-if="errors.name" class="pt-2 text-body-small text-red-400" role="alert">
           {{ errors.name }}
         </p>
       </div>
 
       <!-- Email Field -->
       <div class="pb-4">
-        <label for="email" class="block text-body font-medium text-primary mb-3">
-          Your Email
-        </label>
+        <label for="email" class="block text-body font-black text-primary pb-2"> Your Email </label>
         <div class="relative">
           <input
             id="email"
@@ -223,23 +233,29 @@ const handleSubmit = async (event: Event): Promise<void> => {
             :class="{ error: errors.email }"
           />
           <!-- Placeholder overlay for smooth transitions -->
-          <div v-if="!email" class="absolute inset-0 pointer-events-none flex items-center px-4">
+          <div
+            v-if="!email"
+            class="absolute inset-0 pointer-events-none flex items-center px-4 overflow-hidden"
+          >
             <span
               class="text-body text-placeholder placeholder-overlay-text"
-              :class="{ 'placeholder-fade-out': isFadingOut, 'placeholder-fade-in': isFadingIn }"
+              :class="{
+                'animate-[var(--animate-fade-out)]': isFadingOut,
+                'animate-[var(--animate-fade-in)]': isFadingIn,
+              }"
             >
               {{ placeholderEmail }}
             </span>
           </div>
         </div>
-        <p v-if="errors.email" class="mt-3 text-body-small text-red-400" role="alert">
+        <p v-if="errors.email" class="pt-2 text-body-small text-red-400" role="alert">
           {{ errors.email }}
         </p>
       </div>
 
       <!-- Organization Name Field (Optional) -->
       <div class="pb-4">
-        <label for="organizationName" class="block text-body font-medium text-primary mb-3">
+        <label for="organizationName" class="block text-body font-black text-primary pb-2">
           Organization Name
           <span class="text-body-small font-normal text-muted ml-1">(Optional)</span>
         </label>
@@ -251,14 +267,14 @@ const handleSubmit = async (event: Event): Promise<void> => {
           placeholder="University, Research Lab, Government Agency, or Company"
           class="input-base"
         />
-        <p class="mt-2 text-body-small text-muted">
+        <p class="pt-2 text-body-small text-muted">
           If you don't have one, that's OK! We'll work with you regardless.
         </p>
       </div>
 
       <!-- Organization Description Field (Optional) -->
       <div class="pb-4">
-        <label for="organizationDescription" class="block text-body font-medium text-primary mb-3">
+        <label for="organizationDescription" class="block text-body font-black text-primary pb-2">
           What does your organization do or intend to do?
           <span class="text-body-small font-normal text-muted ml-1">(Optional)</span>
         </label>
@@ -270,14 +286,14 @@ const handleSubmit = async (event: Event): Promise<void> => {
           placeholder="Briefly describe your organization, research focus, or services..."
           class="input-base resize-vertical"
         ></textarea>
-        <p class="mt-2 text-body-small text-muted">
+        <p class="pt-2 text-body-small text-muted">
           This helps us better understand how we can assist you.
         </p>
       </div>
 
       <!-- Referral Source Field (Optional) -->
       <div class="pb-4">
-        <label for="referralSource" class="block text-body font-medium text-primary mb-3">
+        <label for="referralSource" class="block text-body font-black text-primary pb-2">
           Who can we thank?
           <span class="text-body-small font-normal text-muted ml-1">(Optional)</span>
         </label>
@@ -289,7 +305,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
           placeholder="Organization, person, or referral source"
           class="input-base"
         />
-        <p class="mt-2 text-body-small text-muted">
+        <p class="pt-2 text-body-small text-muted">
           If you found us through an organization, accelerator, university, investor, or friend of
           the startup community, please let us know!
         </p>
@@ -297,7 +313,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
 
       <!-- Message Field (Required) -->
       <div class="pb-4">
-        <label for="message" class="block text-body font-medium text-primary mb-3">
+        <label for="message" class="block text-body font-black text-primary pb-2">
           How can we help?
         </label>
         <textarea
@@ -309,20 +325,20 @@ const handleSubmit = async (event: Event): Promise<void> => {
           class="input-base resize-vertical"
           :class="{ error: errors.message }"
         ></textarea>
-        <p v-if="errors.message" class="mt-3 text-body-small text-red-400" role="alert">
+        <p v-if="errors.message" class="pt-2 text-body-small text-red-400" role="alert">
           {{ errors.message }}
         </p>
-        <p v-else class="mt-2 text-body-small text-muted">
+        <p v-else class="pt-2 text-body-small text-muted">
           Please provide details about what you're looking for so we can respond appropriately.
         </p>
       </div>
 
       <!-- Status Messages -->
-      <div v-if="submitStatus === 'success'" class="message-success">
+      <div v-if="submitStatus === 'success'" class="pt-2 message-success">
         <p>Thank you for your message! We'll get back to you soon.</p>
       </div>
 
-      <div v-if="submitStatus === 'error'" class="message-error">
+      <div v-if="submitStatus === 'error'" class="pt-2 message-error">
         <p>An error occurred while submitting your message. Please try again.</p>
       </div>
 
