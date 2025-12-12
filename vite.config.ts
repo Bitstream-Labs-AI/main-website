@@ -22,13 +22,13 @@ export default defineConfig(() => {
   // Parse allowed hosts from environment variable (comma-separated)
   const allowedHosts = process.env.VITE_PREVIEW_ALLOWED_HOSTS
     ? process.env.VITE_PREVIEW_ALLOWED_HOSTS.split(',').map((host) => host.trim())
-    : undefined
+    : []
 
   // Also support dev server allowed hosts (for Netlify dev server)
   // Parse server allowed hosts from environment variable
   const serverAllowedHostsList = process.env.VITE_SERVER_ALLOWED_HOSTS
     ? process.env.VITE_SERVER_ALLOWED_HOSTS.split(',').map((host) => host.trim())
-    : undefined
+    : []
 
   // Create allowed hosts function for dev server
   // Allows Netlify dev server hosts by default, plus any explicitly configured hosts
