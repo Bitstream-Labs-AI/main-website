@@ -1,0 +1,20 @@
+# Get list of staged files that match our file patterns
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx|ts|tsx|vue|css|scss|json|md)$' || true)
+
+if [ -z "$STAGED_FILES" ]; then
+  echo "ℹ️  No files to lint or format"
+else
+  echo "🔍 Running lint on staged files..."
+  echo "$STAGED_FILES" | xargs pnpm exec eslint --fix --cache || true
+
+  echo "✨ Running format on staged files..."
+  echo "$STAGED_FILES" | xargs pnpm exec prettier --write --experimental-cli || true
+
+  echo "📦 Staging auto-fixed files..."
+  echo "$STAGED_FILES" | xargs git add || true
+fi
+
+echo "🧪 Running unit tests..."
+pnpm test:unit
+
+echo "✅ Pre-commit checks passed!"
