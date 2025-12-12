@@ -19,32 +19,25 @@ export default defineConfig(() => {
     }
   }
 
-  // Parse allowed hosts from environment variable (comma-separated)
-  const allowedHosts = process.env.VITE_PREVIEW_ALLOWED_HOSTS
-    ? process.env.VITE_PREVIEW_ALLOWED_HOSTS.split(',').map((host) => host.trim())
-    : []
+  // Parse preview allowed hosts from environment variable (comma-separated)
+  // Used for vite preview command - should include production domains like bitstreamlabs.ai and *.netlify.app
+  const previewAllowedHostsEnv = process.env.VITE_PREVIEW_ALLOWED_HOSTS?.trim()
+  const previewAllowedHosts: string[] = previewAllowedHostsEnv
+    ? previewAllowedHostsEnv
+        .split(',')
+        .map((host) => host.trim())
+        .filter((host) => host.length > 0)
+    : ['localhost'] // Only allow localhost by default (restrictive)
 
-  // Also support dev server allowed hosts (for Netlify dev server)
-  // Parse server allowed hosts from environment variable
-  const serverAllowedHostsList = process.env.VITE_SERVER_ALLOWED_HOSTS
-    ? process.env.VITE_SERVER_ALLOWED_HOSTS.split(',').map((host) => host.trim())
-    : []
-
-  // Create allowed hosts function for dev server
-  // Allows Netlify dev server hosts by default, plus any explicitly configured hosts
-  const serverAllowedHosts = serverAllowedHostsList
-    ? serverAllowedHostsList
-    : (host: string) => {
-        // Allow Netlify dev server hosts (devserver-*.netlify.app)
-        if (host.includes('.netlify.app')) {
-          return true
-        }
-        // Allow localhost and local IPs
-        if (host === 'localhost' || host.startsWith('127.') || host.startsWith('192.168.')) {
-          return true
-        }
-        return false
-      }
+  // Parse dev server allowed hosts from environment variable (comma-separated)
+  // Used for vite dev command - can include Netlify dev server hosts
+  const serverAllowedHostsEnv = process.env.VITE_SERVER_ALLOWED_HOSTS?.trim()
+  const serverAllowedHosts: string[] = serverAllowedHostsEnv
+    ? serverAllowedHostsEnv
+        .split(',')
+        .map((host) => host.trim())
+        .filter((host) => host.length > 0)
+    : ['localhost'] // Only allow localhost by default (restrictive)
 
   return {
     plugins,
@@ -57,7 +50,7 @@ export default defineConfig(() => {
       allowedHosts: serverAllowedHosts,
     },
     preview: {
-      allowedHosts,
+      allowedHosts: previewAllowedHosts,
     },
   }
 })
