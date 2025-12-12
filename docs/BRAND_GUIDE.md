@@ -563,7 +563,7 @@ Tone adapts our voice to different situations while maintaining our core persona
 **Preferred Terminology:**
 
 - **Clients** (not "customers" - we're B2B)
-- **R&D teams** (not "developers" - more specific)
+- **teams** (not "developers" - more general)
 - **Benchmarking** (not "testing" - more precise)
 - **Hardware engineering** (not "hardware development" - more technical)
 - **Performance metrics** (not "results" - more specific)

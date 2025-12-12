@@ -9,7 +9,7 @@ useHead({
     {
       name: 'description',
       content:
-        'We set the standard in AI benchmarking by providing expert consulting to R&D teams pushing the boundaries of intelligent hardware.',
+        'We set the standard in AI benchmarking by providing expert consulting to teams pushing the boundaries of intelligent hardware.',
     },
   ],
 })
@@ -68,8 +68,8 @@ const handleContactSubmit = async (_data: {
               Expert AI Benchmarking & Hardware Consulting
             </p>
             <p class="text-body-large text-muted mx-auto">
-              We set the standard in AI benchmarking by providing expert consulting to R&D teams
-              pushing the boundaries of intelligent hardware.
+              We set the standard in AI benchmarking by providing expert consulting to teams pushing
+              the boundaries of intelligent hardware.
             </p>
           </div>
         </div>
