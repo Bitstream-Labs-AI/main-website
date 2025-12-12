@@ -26,9 +26,9 @@ const handleContactSubmit = async (data: ContactFormData): Promise<void> => {
   <div class="bg-page flex flex-col">
     <SiteNavigation />
     <main class="flex-1 relative">
-      <!-- Decorative floating orbs constrained to content width -->
+      <!-- Decorative floating orbs - positioned outside hero section to avoid clipping -->
       <div class="orb-layer" aria-hidden="true">
-        <div class="orb-layer-inner container-content">
+        <div class="orb-layer-inner">
           <div class="orb orb-1"></div>
           <div class="orb orb-2"></div>
           <div class="orb orb-3"></div>
@@ -62,7 +62,7 @@ const handleContactSubmit = async (data: ContactFormData): Promise<void> => {
                 <div class="card">
                   <p class="text-body-large text-primary leading-relaxed text-center md:text-left">
                     <strong class="heading-cyan">We set the standard in AI benchmarking</strong> by
-                    providing expert consulting to R&D teams pushing the boundaries of intelligent
+                    providing expert consulting to teams pushing the boundaries of intelligent
                     hardware.
                   </p>
                 </div>
