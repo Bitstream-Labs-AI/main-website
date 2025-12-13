@@ -209,6 +209,12 @@
   }
 }
 
+/* Main element - prevent horizontal scrolling from orbs */
+main {
+  width: 100%;
+  overflow-x: hidden;
+}
+
 /* Hero Section - Balanced spacing */
 .hero-section {
   min-height: 100vh;
