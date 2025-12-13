@@ -163,12 +163,36 @@ onUnmounted(() => {
         <!-- Mobile Menu Toggle Button (Hamburger when closed, X when open) -->
         <button
           @click="toggleMenu"
-          class="md:hidden p-2 text-primary hover:text-futurist-cyan transition-colors bg-transparent border-none cursor-pointer"
+          class="md:hidden p-2 text-primary hover:text-futurist-cyan bg-transparent border-none cursor-pointer relative w-6 h-6 flex items-center justify-center"
           :aria-label="isMenuOpen ? 'Close menu' : 'Open menu'"
           :aria-expanded="isMenuOpen"
         >
-          <Bars3Icon v-if="!isMenuOpen" class="w-6 h-6" />
-          <XMarkIcon v-else class="w-6 h-6" />
+          <div class="relative w-6 h-6 flex items-center justify-center">
+            <!-- Hamburger icon: rotates 90° clockwise out, enters from -90° counter-clockwise -->
+            <Transition
+              mode="out-in"
+              enter-active-class="transition-all duration-500 ease-in-out"
+              leave-active-class="transition-all duration-500 ease-in-out"
+              enter-from-class="opacity-0 rotate-90 scale-75"
+              enter-to-class="opacity-100 rotate-0 scale-100"
+              leave-from-class="opacity-100 rotate-0 scale-100"
+              leave-to-class="opacity-0 rotate-90 scale-75"
+            >
+              <Bars3Icon v-if="!isMenuOpen" key="bars" class="w-6 h-6 absolute inset-0 m-auto" />
+            </Transition>
+            <!-- X icon: rotates -90° counter-clockwise out, enters from 90° clockwise -->
+            <Transition
+              mode="out-in"
+              enter-active-class="transition-all duration-500 ease-in-out"
+              leave-active-class="transition-all duration-500 ease-in-out"
+              enter-from-class="opacity-0 -rotate-90 scale-75"
+              enter-to-class="opacity-100 rotate-0 scale-100"
+              leave-from-class="opacity-100 rotate-0 scale-100"
+              leave-to-class="opacity-0 -rotate-90 scale-75"
+            >
+              <XMarkIcon v-if="isMenuOpen" key="x" class="w-6 h-6 absolute inset-0 m-auto" />
+            </Transition>
+          </div>
         </button>
       </div>
     </div>
