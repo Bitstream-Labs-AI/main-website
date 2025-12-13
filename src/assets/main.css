@@ -189,13 +189,18 @@
   /* More opaque for better glass effect */
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
+  /* Subtle border for glass effect - only visible when backdrop is active */
   border-bottom: 1px solid rgba(45, 52, 71, 0.3);
-  /* Subtle border for glass effect */
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
   /* Soft shadow for depth */
   /* Extend into iOS safe area (status bar/Dynamic Island) */
   margin-top: calc(-1 * env(safe-area-inset-top));
   padding-top: env(safe-area-inset-top);
+}
+
+/* Ensure nav element doesn't have border when transparent */
+nav.bg-transparent {
+  border-bottom: none;
 }
 
 /* Section Styles */

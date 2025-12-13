@@ -128,16 +128,13 @@ onUnmounted(() => {
 <template>
   <nav
     :class="[
-      'fixed top-0 left-0 right-0 z-[10000] transition-all duration-300',
-      isScrolled || isMenuOpen
-        ? 'nav-backdrop border-b border-industrial-steel shadow-lg'
-        : 'bg-transparent',
+      'fixed top-0 left-0 right-0 z-[10000] transition-all duration-300 nav-backdrop shadow-lg',
     ]"
   >
     <div
       class="container-content py-4"
       :style="{
-        paddingTop: isScrolled || isMenuOpen ? `calc(1rem + env(safe-area-inset-top))` : '1rem',
+        paddingTop: `calc(1rem + env(safe-area-inset-top))`,
       }"
     >
       <div class="flex items-center justify-between">
