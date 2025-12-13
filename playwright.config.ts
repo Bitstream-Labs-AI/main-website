@@ -126,10 +126,14 @@ export default defineConfig({
            * Use the dev server by default for faster feedback loop.
            * Use the preview server on CI for more realistic testing.
            * Playwright will re-use the local server if there is already a dev-server running.
+           *
+           * For preview mode, we need to build first with the env vars since Vite
+           * embeds VITE_* variables at build time, not at preview time.
            */
-          command: process.env.CI === 'true' ? 'pnpm preview' : 'pnpm dev',
+          command: process.env.CI === 'true' ? 'pnpm build && pnpm preview' : 'pnpm dev',
           port: process.env.CI === 'true' ? 4173 : 5173,
-          reuseExistingServer: process.env.CI !== 'true',
+          // Always start a fresh server to ensure env vars are applied
+          reuseExistingServer: false,
           timeout: 120 * 1000,
           env: {
             NODE_ENV: 'test',
