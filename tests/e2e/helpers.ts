@@ -10,6 +10,10 @@ export async function hideDevTools(page: Page): Promise<void> {
     if (inspector) {
       ;(inspector as HTMLElement).style.display = 'none'
     }
+    const devtools = document.querySelector('#__vue-devtools-container__')
+    if (devtools) {
+      ;(devtools as HTMLElement).style.display = 'none'
+    }
   })
 }
 

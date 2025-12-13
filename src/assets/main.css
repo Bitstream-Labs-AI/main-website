@@ -600,7 +600,23 @@ main {
   }
 }
 
-/* Hide scrollbar on mobile when menu is open */
+/* Hide scrollbars on mobile devices by default */
+@media (max-width: 767px) {
+  html,
+  body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
+/* Additional styles when menu is open */
 html.menu-open {
   /* Hide scrollbar on html without affecting scroll position */
   scrollbar-width: none;

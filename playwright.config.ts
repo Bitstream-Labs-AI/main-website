@@ -54,6 +54,9 @@ export default defineConfig({
     /* Only on CI systems run the tests headless */
     headless: !!process.env.CI,
   },
+  /* Global environment variables for all tests */
+  /* Note: For Vite env vars, they need to be set at build time via webServer.env */
+  /* This ensures contact form is enabled for all e2e tests */
 
   /* Configure projects for major browsers and viewports */
   projects: [
