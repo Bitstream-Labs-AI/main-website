@@ -60,6 +60,8 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: #0a0e1a;
+  /* Industrial Dark - prevent white flash on iOS */
 }
 
 html,

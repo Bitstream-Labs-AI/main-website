@@ -54,6 +54,9 @@ export default defineConfig({
     /* Only on CI systems run the tests headless */
     headless: !!process.env.CI,
   },
+  /* Global environment variables for all tests */
+  /* Note: For Vite env vars, they need to be set at build time via webServer.env */
+  /* This ensures contact form is enabled for all e2e tests */
 
   /* Configure projects for major browsers and viewports */
   projects: [
@@ -123,10 +126,14 @@ export default defineConfig({
            * Use the dev server by default for faster feedback loop.
            * Use the preview server on CI for more realistic testing.
            * Playwright will re-use the local server if there is already a dev-server running.
+           *
+           * For preview mode, we need to build first with the env vars since Vite
+           * embeds VITE_* variables at build time, not at preview time.
            */
-          command: process.env.CI === 'true' ? 'pnpm preview' : 'pnpm dev',
+          command: process.env.CI === 'true' ? 'pnpm build && pnpm preview' : 'pnpm dev',
           port: process.env.CI === 'true' ? 4173 : 5173,
-          reuseExistingServer: process.env.CI !== 'true',
+          // Always start a fresh server to ensure env vars are applied
+          reuseExistingServer: false,
           timeout: 120 * 1000,
           env: {
             NODE_ENV: 'test',

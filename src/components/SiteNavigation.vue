@@ -65,12 +65,66 @@ const closeMenu = () => {
   isMenuOpen.value = false
 }
 
+// Blur effect classes for menu open state
+const blurClassesOpen = [
+  'blur-sm',
+  'scale-[0.98]',
+  'opacity-80',
+  'transition-all',
+  'duration-500',
+  'ease-out',
+]
+
+// Blur effect classes for menu close state (longer transition for visibility)
+const blurClassesClose = [
+  'blur-sm',
+  'scale-[0.98]',
+  'opacity-80',
+  'transition-all',
+  'duration-700',
+  'ease-in-out',
+]
+
 // Body scroll lock when menu is open
 watch(isMenuOpen, (open) => {
+  // Target main and footer elements to apply blur effects (avoid blurring the fixed navigation)
+  const mainElement = document.querySelector('main')
+  const footerElement = document.querySelector('footer')
+
   if (open) {
+    // Save current scroll position before applying overflow hidden
+    const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop
+
+    // Lock scroll on body and add scrollbar hiding classes
     document.body.style.overflow = 'hidden'
+    document.documentElement.classList.add('menu-open')
+    document.body.classList.add('menu-open')
+
+    // Restore scroll position immediately to prevent jump
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollY)
+    })
+
+    // Apply blur effects to main and footer content
+    if (mainElement) {
+      mainElement.classList.add(...blurClassesOpen)
+    }
+    if (footerElement) {
+      footerElement.classList.add(...blurClassesOpen)
+    }
   } else {
+    // Restore scroll and remove scrollbar hiding classes
     document.body.style.overflow = ''
+    document.documentElement.classList.remove('menu-open')
+    document.body.classList.remove('menu-open')
+
+    // Remove blur effects with more visible transition
+    if (mainElement) {
+      mainElement.classList.remove(...blurClassesClose)
+    }
+    if (footerElement) {
+      footerElement.classList.remove(...blurClassesClose)
+    }
   }
 })
 
@@ -120,28 +174,27 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('scroll', updateActiveSection)
-  // Cleanup: restore body scroll if menu was open
+  // Cleanup: restore scroll and remove classes if menu was open
   document.body.style.overflow = ''
+  document.documentElement.classList.remove('menu-open')
+  document.body.classList.remove('menu-open')
 })
 </script>
 
 <template>
   <nav
     :class="[
-      'fixed top-0 left-0 right-0 z-[10000] transition-all duration-300',
-      isScrolled || isMenuOpen
-        ? 'nav-backdrop border-b border-industrial-steel shadow-lg'
-        : 'bg-transparent',
+      'fixed top-0 left-0 right-0 z-[10000] transition-all duration-300 nav-backdrop shadow-lg',
     ]"
   >
-    <div class="container-content py-4">
+    <div
+      class="container-content py-4"
+      :style="{
+        paddingTop: `calc(1rem + env(safe-area-inset-top))`,
+      }"
+    >
       <div class="flex items-center justify-between">
-        <div
-          class="text-xl font-bold gradient-text-primary cursor-pointer"
-          @click="scrollToSection('hero')"
-        >
-          Bitstream Labs.AI
-        </div>
+        <div class="text-xl font-bold gradient-text-primary">Bitstream Labs.AI</div>
         <!-- Desktop Menu -->
         <ul class="hidden md:flex items-center gap-6 list-none m-0 p-0">
           <li v-for="item in navItems" :key="item.id">
@@ -161,12 +214,36 @@ onUnmounted(() => {
         <!-- Mobile Menu Toggle Button (Hamburger when closed, X when open) -->
         <button
           @click="toggleMenu"
-          class="md:hidden p-2 text-primary hover:text-futurist-cyan transition-colors bg-transparent border-none cursor-pointer"
+          class="md:hidden p-2 text-primary hover:text-futurist-cyan bg-transparent border-none cursor-pointer relative w-6 h-6 flex items-center justify-center"
           :aria-label="isMenuOpen ? 'Close menu' : 'Open menu'"
           :aria-expanded="isMenuOpen"
         >
-          <Bars3Icon v-if="!isMenuOpen" class="w-6 h-6" />
-          <XMarkIcon v-else class="w-6 h-6" />
+          <div class="relative w-6 h-6 flex items-center justify-center">
+            <!-- Hamburger icon: rotates 90° clockwise out, enters from -90° counter-clockwise -->
+            <Transition
+              mode="out-in"
+              enter-active-class="transition-all duration-500 ease-in-out"
+              leave-active-class="transition-all duration-500 ease-in-out"
+              enter-from-class="opacity-0 rotate-90 scale-75"
+              enter-to-class="opacity-100 rotate-0 scale-100"
+              leave-from-class="opacity-100 rotate-0 scale-100"
+              leave-to-class="opacity-0 rotate-90 scale-75"
+            >
+              <Bars3Icon v-if="!isMenuOpen" key="bars" class="w-6 h-6 absolute inset-0 m-auto" />
+            </Transition>
+            <!-- X icon: rotates -90° counter-clockwise out, enters from 90° clockwise -->
+            <Transition
+              mode="out-in"
+              enter-active-class="transition-all duration-500 ease-in-out"
+              leave-active-class="transition-all duration-500 ease-in-out"
+              enter-from-class="opacity-0 -rotate-90 scale-75"
+              enter-to-class="opacity-100 rotate-0 scale-100"
+              leave-from-class="opacity-100 rotate-0 scale-100"
+              leave-to-class="opacity-0 -rotate-90 scale-75"
+            >
+              <XMarkIcon v-if="isMenuOpen" key="x" class="w-6 h-6 absolute inset-0 m-auto" />
+            </Transition>
+          </div>
         </button>
       </div>
     </div>
