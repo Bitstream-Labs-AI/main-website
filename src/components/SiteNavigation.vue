@@ -65,12 +65,66 @@ const closeMenu = () => {
   isMenuOpen.value = false
 }
 
+// Blur effect classes for menu open state
+const blurClassesOpen = [
+  'blur-sm',
+  'scale-[0.98]',
+  'opacity-80',
+  'transition-all',
+  'duration-500',
+  'ease-out',
+]
+
+// Blur effect classes for menu close state (longer transition for visibility)
+const blurClassesClose = [
+  'blur-sm',
+  'scale-[0.98]',
+  'opacity-80',
+  'transition-all',
+  'duration-700',
+  'ease-in-out',
+]
+
 // Body scroll lock when menu is open
 watch(isMenuOpen, (open) => {
+  // Target main and footer elements to apply blur effects (avoid blurring the fixed navigation)
+  const mainElement = document.querySelector('main')
+  const footerElement = document.querySelector('footer')
+
   if (open) {
+    // Save current scroll position before applying overflow hidden
+    const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop
+
+    // Lock scroll on body and add scrollbar hiding classes
     document.body.style.overflow = 'hidden'
+    document.documentElement.classList.add('menu-open')
+    document.body.classList.add('menu-open')
+
+    // Restore scroll position immediately to prevent jump
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollY)
+    })
+
+    // Apply blur effects to main and footer content
+    if (mainElement) {
+      mainElement.classList.add(...blurClassesOpen)
+    }
+    if (footerElement) {
+      footerElement.classList.add(...blurClassesOpen)
+    }
   } else {
+    // Restore scroll and remove scrollbar hiding classes
     document.body.style.overflow = ''
+    document.documentElement.classList.remove('menu-open')
+    document.body.classList.remove('menu-open')
+
+    // Remove blur effects with more visible transition
+    if (mainElement) {
+      mainElement.classList.remove(...blurClassesClose)
+    }
+    if (footerElement) {
+      footerElement.classList.remove(...blurClassesClose)
+    }
   }
 })
 
@@ -120,8 +174,10 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('scroll', updateActiveSection)
-  // Cleanup: restore body scroll if menu was open
+  // Cleanup: restore scroll and remove classes if menu was open
   document.body.style.overflow = ''
+  document.documentElement.classList.remove('menu-open')
+  document.body.classList.remove('menu-open')
 })
 </script>
 
@@ -138,12 +194,7 @@ onUnmounted(() => {
       }"
     >
       <div class="flex items-center justify-between">
-        <div
-          class="text-xl font-bold gradient-text-primary cursor-pointer"
-          @click="scrollToSection('hero')"
-        >
-          Bitstream Labs.AI
-        </div>
+        <div class="text-xl font-bold gradient-text-primary">Bitstream Labs.AI</div>
         <!-- Desktop Menu -->
         <ul class="hidden md:flex items-center gap-6 list-none m-0 p-0">
           <li v-for="item in navItems" :key="item.id">

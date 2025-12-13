@@ -599,3 +599,32 @@ main {
     padding-bottom: var(--spacing-section-mobile);
   }
 }
+
+/* Hide scrollbar on mobile when menu is open */
+html.menu-open {
+  /* Hide scrollbar on html without affecting scroll position */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html.menu-open::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+body.menu-open {
+  overflow: hidden !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Prevent iOS momentum scrolling */
+  touch-action: none;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+}
+
+body.menu-open::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
