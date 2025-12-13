@@ -193,6 +193,9 @@
   /* Subtle border for glass effect */
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
   /* Soft shadow for depth */
+  /* Extend into iOS safe area (status bar/Dynamic Island) */
+  margin-top: calc(-1 * env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
 }
 
 /* Section Styles */

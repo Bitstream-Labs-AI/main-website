@@ -134,7 +134,12 @@ onUnmounted(() => {
         : 'bg-transparent',
     ]"
   >
-    <div class="container-content py-4">
+    <div
+      class="container-content py-4"
+      :style="{
+        paddingTop: isScrolled || isMenuOpen ? `calc(1rem + env(safe-area-inset-top))` : '1rem',
+      }"
+    >
       <div class="flex items-center justify-between">
         <div
           class="text-xl font-bold gradient-text-primary cursor-pointer"
