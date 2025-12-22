@@ -1,0 +1,25 @@
+# QR Code redirects for contact vCards
+# These redirects provide stable URLs for QR codes that point to contact information.
+# The subdomain qrcode-redirect.bitstreamlabs.ai must be configured in Netlify
+# as a domain alias for these redirects to work.
+#
+# Temporarily redirecting to main site until vCard URLs are finalized.
+# Using 302 (temporary) redirects until final URLs are confirmed.
+# Once final vCard URLs are determined, update these redirects and consider upgrading to 301 (permanent) redirects.
+[[redirects]]
+  from = "https://qrcode-redirect.bitstreamlabs.ai/joanna"
+  to = "https://bitstreamlabs.ai"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "https://qrcode-redirect.bitstreamlabs.ai/saul"
+  to = "https://bitstreamlabs.ai"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "https://qrcode-redirect.bitstreamlabs.ai/sales"
+  to = "https://bitstreamlabs.ai"
+  status = 302
+  force = true
