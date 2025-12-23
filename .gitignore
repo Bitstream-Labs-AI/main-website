@@ -57,3 +57,6 @@ __screenshots__/
 # Keep visual regression snapshots - they should be committed (with Git LFS)
 !tests/e2e/**/*-snapshots/
 !tests/**/*.png
+
+# Netlify - Local State & Build Cache
+.netlify/
