@@ -9,6 +9,7 @@ lerna-debug.log*
 
 # Dependencies
 node_modules
+package-lock.json
 
 # OS files
 .DS_Store
@@ -20,10 +21,12 @@ ehthumbs.db
 Thumbs.db
 
 # Build outputs
-dist
+dist/
 dist-ssr
 *.tsbuildinfo
 .vite
+build/
+out/
 
 # Testing
 coverage
