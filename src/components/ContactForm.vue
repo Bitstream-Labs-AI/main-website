@@ -484,7 +484,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
         </div>
 
         <p class="pt-2 text-body-small text-muted">
-          Get occassional new about AI hardware benchmarking and R&D insights.
+          Get occassional updates and news about AI benchmarking and R&D insights.
         </p>
       </div>
 
