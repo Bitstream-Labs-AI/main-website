@@ -244,6 +244,8 @@ const handleSubmit = async (event: Event): Promise<void> => {
     organizationDescription.value = ''
     referralSource.value = ''
     message.value = ''
+    marketingConsent.value = false
+
     errors.value = {}
   } catch {
     submitStatus.value = 'error'
