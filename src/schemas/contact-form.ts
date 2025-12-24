@@ -79,6 +79,12 @@ export const contactFormSchema = z.object({
       CONTACT_FORM_MAX_LENGTHS.message,
       `Message must be ${CONTACT_FORM_MAX_LENGTHS.message} characters or less`,
     ),
+  marketingConsent: z.preprocess((val) => {
+    if (typeof val === 'string') {
+      return val === 'true' || val === 'on'
+    }
+    return val
+  }, z.boolean().default(false)),
 })
 
 /**
@@ -86,3 +92,9 @@ export const contactFormSchema = z.object({
  * This ensures the type always matches the validation schema.
  */
 export type ContactFormData = z.infer<typeof contactFormSchema>
+
+export interface ContactFormResponse {
+  success: boolean
+  message?: string
+  error?: string
+}

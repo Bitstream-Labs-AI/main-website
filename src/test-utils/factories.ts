@@ -8,6 +8,7 @@ export function createMockContactFormData(overrides?: Partial<ContactFormData>):
     name: 'John Doe',
     email: 'john.doe@example.com',
     message: 'This is a test message',
+    marketingConsent: false,
     ...overrides,
   }
 }

@@ -525,10 +525,48 @@ main {
   max-width: 100%;
 }
 
+/* NEW: Hide overlay text when the input is active/focused */
+.input-base:focus ~ div .placeholder-overlay-text {
+  opacity: 0;
+  visibility: hidden;
+}
+
 .input-base.error {
   border-color: #ef4444;
   /* Red for errors */
   box-shadow: 0 0 0 2px #ef4444;
+}
+
+/* src/assets/main.css */
+
+/* Custom Checkbox Styling override for consistency */
+input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #1a1f2e; /* Industrial Slate */
+  margin: 0;
+  border: 1px solid #2d3447; /* Industrial Steel */
+  display: grid;
+  place-content: center;
+}
+
+input[type='checkbox']::before {
+  content: '';
+  width: 0.65em;
+  height: 0.65em;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1em 1em #00d9ff; /* Futurist Cyan */
+  transform-origin: center;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+input[type='checkbox']:checked::before {
+  transform: scale(1);
+}
+
+input[type='checkbox']:checked {
+  border-color: #00d9ff;
 }
 
 /* Status Message Styles */
