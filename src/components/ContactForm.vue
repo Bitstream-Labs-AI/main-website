@@ -272,6 +272,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
       name="contact"
       data-netlify-recaptcha="true"
       data-netlify="true"
+      netlify
     >
       <!-- Name Field -->
       <div class="pb-4">
