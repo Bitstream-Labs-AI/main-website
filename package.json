@@ -27,6 +27,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@netlify/functions": "^5.1.2",
     "@playwright/test": "^1.57.0",
     "@tailwindcss/vite": "^4.1.18",
     "@tsconfig/node24": "^24.0.3",

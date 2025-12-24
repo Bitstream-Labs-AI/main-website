@@ -27,6 +27,9 @@ importers:
         specifier: ^4.1.13
         version: 4.2.1
     devDependencies:
+      '@netlify/functions':
+        specifier: ^5.1.2
+        version: 5.1.2
       '@playwright/test':
         specifier: ^1.57.0
         version: 1.57.0
@@ -1005,6 +1008,10 @@ packages:
     resolution: {integrity: sha512-2Z/gnq+ZU4u6rk+qYGHC584iHb4tEWRaM1RpivHR60x9xfs6LkbJiZZNLsVNIx5WH78pN/Jiti4DMzEDT9cy4g==}
     engines: {node: '>=18.14.0'}
 
+  '@netlify/functions@5.1.2':
+    resolution: {integrity: sha512-tpPiLSkQatuexH8AdAZ8RlALvT7ixOE9VhvpkzQGNvihcms8hzmvUDuSxQa7UneTj/sHsdirnXmnJ+nmf+Nx/w==}
+    engines: {node: '>=18.0.0'}
+
   '@netlify/git-utils@6.0.3':
     resolution: {integrity: sha512-f6zGgGaIL0/wsraqa1wraFFuv1kY6FqDtz9elPWsXVQpLMS/T6/rc5Qr7RT1FezUobA6XdspLJ+mTpIo2VNSzg==}
     engines: {node: '>=18.14.0'}
@@ -1129,6 +1136,10 @@ packages:
 
   '@netlify/types@2.2.0':
     resolution: {integrity: sha512-XOWlZ2wPpdRKkAOcQbjIf/Qz7L4RjcSVINVNQ9p3F6U8V6KSEOsB3fPrc6Ly8EOeJioHUepRPuzHzJE/7V5EsA==}
+    engines: {node: ^18.14.0 || >=20}
+
+  '@netlify/types@2.3.0':
+    resolution: {integrity: sha512-5gxMWh/S7wr0uHKSTbMv4bjWmWSpwpeLYvErWeVNAPll5/QNFo9aWimMAUuh8ReLY3/fg92XAroVVu7+z27Snw==}
     engines: {node: ^18.14.0 || >=20}
 
   '@netlify/zip-it-and-ship-it@14.1.14':
@@ -6636,6 +6647,10 @@ snapshots:
       - rollup
       - supports-color
 
+  '@netlify/functions@5.1.2':
+    dependencies:
+      '@netlify/types': 2.3.0
+
   '@netlify/git-utils@6.0.3':
     dependencies:
       execa: 8.0.1
@@ -6739,6 +6754,8 @@ snapshots:
   '@netlify/serverless-functions-api@2.8.2': {}
 
   '@netlify/types@2.2.0': {}
+
+  '@netlify/types@2.3.0': {}
 
   '@netlify/zip-it-and-ship-it@14.1.14(rollup@4.54.0)(supports-color@10.2.2)':
     dependencies:
