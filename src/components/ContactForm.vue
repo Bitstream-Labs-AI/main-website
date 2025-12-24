@@ -157,6 +157,7 @@ const organizationName = ref('')
 const organizationDescription = ref('')
 const referralSource = ref('')
 const message = ref('')
+const marketingConsent = ref(false)
 
 const errors = ref<Partial<Record<keyof ContactFormData, string>>>({})
 const isSubmitting = ref(false)
@@ -196,6 +197,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
     name: name.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.name),
     email: email.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.email),
     message: message.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.message),
+    marketingConsent: marketingConsent.value,
   }
 
   if (organizationName.value.trim()) {
@@ -242,6 +244,8 @@ const handleSubmit = async (event: Event): Promise<void> => {
     organizationDescription.value = ''
     referralSource.value = ''
     message.value = ''
+    marketingConsent.value = false
+
     errors.value = {}
   } catch {
     submitStatus.value = 'error'
@@ -262,7 +266,13 @@ const handleSubmit = async (event: Event): Promise<void> => {
       </p>
     </div>
 
-    <form @submit="handleSubmit" class="card">
+    <form
+      @submit="handleSubmit"
+      class="card"
+      name="contact"
+      data-netlify-recaptcha="true"
+      data-netlify="true"
+    >
       <!-- Name Field -->
       <div class="pb-4">
         <label for="name" class="block text-body font-black text-primary pb-2"> Your Name </label>
@@ -451,6 +461,35 @@ const handleSubmit = async (event: Event): Promise<void> => {
         </p>
       </div>
 
+      <div class="pb-4">
+        <div class="flex items-start gap-3">
+          <div class="flex h-6 items-center">
+            <input
+              id="marketingConsent"
+              v-model="marketingConsent"
+              name="marketingConsent"
+              type="checkbox"
+              class="h-5 w-5 rounded border-industrial-steel bg-industrial-slate text-futurist-cyan focus:ring-futurist-cyan/50 focus:ring-offset-0 transition duration-150 ease-in-out cursor-pointer"
+            />
+          </div>
+          <div class="text-sm leading-6">
+            <label
+              for="marketingConsent"
+              class="block text-body font-black text-primary pb-2 cursor-pointer"
+            >
+              Stay Updated
+            </label>
+            <p class="text-muted"></p>
+          </div>
+        </div>
+
+        <p class="pt-2 text-body-small text-muted">
+          Get occassional updates and news about AI benchmarking and R&D insights.
+        </p>
+      </div>
+
+      <div class="pt-2"></div>
+
       <!-- Status Messages -->
       <div v-if="submitStatus === 'success'" class="pt-2 message-success">
         <p>Thank you for your message! We'll get back to you soon.</p>
@@ -460,6 +499,8 @@ const handleSubmit = async (event: Event): Promise<void> => {
         <p>An error occurred while submitting your message. Please try again.</p>
       </div>
 
+      <div data-netlify-recaptcha="true"></div>
+
       <!-- Submit Button -->
       <div class="pt-6">
         <button
@@ -467,7 +508,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
           :disabled="isSubmitting"
           class="btn-primary w-full text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
         >
-          <span v-if="!isSubmitting">Let's Go!</span>
+          <span v-if="!isSubmitting">Submit Inquiry</span>
           <span v-else>Sending...</span>
         </button>
       </div>
