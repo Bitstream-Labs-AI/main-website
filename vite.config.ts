@@ -27,7 +27,7 @@ export default defineConfig(() => {
         .split(',')
         .map((host) => host.trim())
         .filter((host) => host.length > 0)
-    : ['localhost', 'bitstreamlabs.ai', '*.netlify.app'] // Only allow localhost by default (restrictive)
+    : ['localhost'] // Only allow localhost by default (restrictive)
 
   // Parse dev server allowed hosts from environment variable (comma-separated)
   // Used for vite dev command - can include Netlify dev server hosts
@@ -37,7 +37,7 @@ export default defineConfig(() => {
         .split(',')
         .map((host) => host.trim())
         .filter((host) => host.length > 0)
-    : ['localhost', 'bitstreamlabs.ai', '*.netlify.app'] // Only allow localhost by default (restrictive)
+    : ['localhost'] // Only allow localhost by default (restrictive)
 
   return {
     plugins,
