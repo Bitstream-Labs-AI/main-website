@@ -14,6 +14,15 @@ export default defineConfigWithVueTs(
   {
     name: 'app/files-to-lint',
     files: ['**/*.{ts,mts,tsx,vue}'],
+    rules: {
+      'vue/multi-word-component-names': [
+        'error',
+        {
+          // Ignore Vike's special "plus" files
+          ignores: ['+Page', '+Layout', '+Head', '+config'],
+        },
+      ],
+    },
   },
 
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),

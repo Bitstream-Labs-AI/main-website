@@ -1,15 +1,20 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig, type PluginOption } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
+import vike from 'vike/plugin'
 
-// https://vite.dev/config/
 export default defineConfig(() => {
-  const plugins: PluginOption[] = [vue(), vueJsx(), tailwindcss()]
-
+  const plugins: PluginOption[] = [
+    vue(),
+    vueJsx(),
+    tailwindcss(),
+    vike({
+      prerender: true,
+    }),
+  ]
   // Only enable Vue DevTools in development mode (not in test/production)
   // Check if we're running in test mode (set by Playwright)
   if (process.env.NODE_ENV !== 'test') {
