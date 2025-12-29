@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { useNavigationController } from './useNavigationController'
 import { isContactFormEnabled } from '@/utils/featureFlags'
+import { ClientOnly } from 'vike-vue/ClientOnly'
 
 const { isMenuOpen, activeSection, toggleMenu, scrollToSection } = useNavigationController()
 
