@@ -500,11 +500,11 @@ const handleSubmit = async (event: Event): Promise<void> => {
       <div class="pt-2"></div>
 
       <!-- Status Messages -->
-      <div v-if="submitStatus === 'success'" class="pt-2 message-success">
+      <div v-if="submitStatus === 'success'" class="pt-2 message-success pb-2">
         <p>Thank you for your message! We'll get back to you soon.</p>
       </div>
 
-      <div v-if="submitStatus === 'error'" class="pt-2 message-error">
+      <div v-if="submitStatus === 'error'" class="pt-2 message-error pb-2">
         <p>An error occurred while submitting your message. Please try again.</p>
       </div>
 
