@@ -273,6 +273,12 @@ const handleSubmit = async (event: Event): Promise<void> => {
       data-netlify-recaptcha="true"
       data-netlify="true"
     >
+      <input type="hidden" name="form-name" value="contact" />
+
+      <p class="hidden">
+        <label>Don’t fill this out if you’re human: <input name="bot-field" /></label>
+      </p>
+
       <!-- Name Field -->
       <div class="pb-4">
         <label for="name" class="block text-body font-black text-primary pb-2"> Your Name </label>

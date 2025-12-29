@@ -1,18 +1,18 @@
 import type { ContactFormData, FormValue, ContactFormResponse } from '../schemas'
 
 // Replace 'any' with the specific union type
-const encode = (data: Record<string, FormValue>) => {
-  return (
-    Object.keys(data)
-      // 1. Filter out undefined keys (optional fields that weren't filled)
-      .filter((key) => data[key] != null)
-      .map((key) => {
-        // 2. Safe encoding: Ensure value is converted to a string before encoding
-        // (This handles numbers/booleans correctly)
-        return encodeURIComponent(key) + '=' + encodeURIComponent(String(data[key]))
-      })
-      .join('&')
-  )
+const encode = (data: Record<string, FormValue>): string => {
+  const params = new URLSearchParams()
+
+  Object.entries(data).forEach(([key, value]) => {
+    // 1. Skip null/undefined values
+    if (value === null || value === undefined) return
+
+    // 2. Convert primitives to strings; handle booleans as 'true'/'false'
+    params.append(key, String(value))
+  })
+
+  return params.toString()
 }
 
 export async function submitContactForm(data: ContactFormData): Promise<void> {
