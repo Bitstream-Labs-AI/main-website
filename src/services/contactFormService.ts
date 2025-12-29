@@ -1,15 +1,17 @@
-import type { ContactFormData, FormValue, ContactFormResponse } from '../schemas'
+import type { ContactFormData, FormValue } from '../schemas'
 
 // Replace 'any' with the specific union type
 const encode = (data: Record<string, FormValue>): string => {
   const params = new URLSearchParams()
 
   Object.entries(data).forEach(([key, value]) => {
-    // 1. Skip null/undefined values
-    if (value === null || value === undefined) return
-
-    // 2. Convert primitives to strings; handle booleans as 'true'/'false'
-    params.append(key, String(value))
+    // If value is null/undefined, send an empty string instead of skipping
+    if (value === null || value === undefined) {
+      params.append(key, '')
+    } else {
+      // Handle booleans specifically to ensure 'true'/'false' strings
+      params.append(key, String(value))
+    }
   })
 
   return params.toString()
