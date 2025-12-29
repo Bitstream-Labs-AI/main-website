@@ -44,8 +44,8 @@ export async function submitContactForm(data: ContactFormData): Promise<void> {
     // Note: Netlify returns a 200 OK for successful form submissions.
     // It usually does NOT return JSON unless you redirect to a JSON file.
     // Usually, just checking response.ok is sufficient here.
-    const responseParsed = (await response.json()) as ContactFormResponse
-    console.log(responseParsed)
+    // const responseParsed = (await response.json()) as ContactFormResponse
+    console.log(response)
   } catch (error) {
     if (error instanceof Error) {
       throw error
