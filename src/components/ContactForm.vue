@@ -267,11 +267,14 @@ const handleSubmit = async (event: Event): Promise<void> => {
     </div>
 
     <form
-      @submit="handleSubmit"
-      class="card"
       name="contact"
-      data-netlify-recaptcha="true"
+      method="POST"
+      action="/"
       data-netlify="true"
+      data-netlify-honeypot="bot-field"
+      @submit.prevent="handleSubmit"
+      class="card"
+      data-netlify-recaptcha="true"
     >
       <input type="hidden" name="form-name" value="contact" />
 

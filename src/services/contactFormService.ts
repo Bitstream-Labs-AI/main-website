@@ -32,6 +32,7 @@ export async function submitContactForm(data: ContactFormData): Promise<void> {
       // CHANGE 3: Include the 'form-name' field (must match your HTML form name attribute)
       body: encode({
         'form-name': 'contact', // <--- CRITICAL: Must match <form name="contact">
+        'bot-field': '', // Add this even if it's empty!
         ...data,
       }),
     })
