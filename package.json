@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vike dev",
     "build": "vike build",
+    "build-only": "vike build",
     "preview": "vike preview",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
