@@ -4,20 +4,26 @@ export interface NetlifyHumanField {
   value: string | number | boolean | null
 }
 
+export interface NetlifyFormPayloadDataSystemFields {
+  ip: string // [PII]
+  user_agent: string
+  referrer: string // FQDN source of the form
+}
+
 export interface NetlifyFormPayload {
   id: string
   form_id: string
   form_name: string
   number: number
   title: string | null
-  email: string
-  name: string
-  first_name: string
-  last_name: string
+  email: string // [PII]
+  name: string // [PII]
+  first_name: string // [PII]
+  last_name: string // [PII]
   company: string | null
   summary: string
   body: string
-  data: Record<string, string | number | boolean | undefined>
+  data: NetlifyFormPayloadDataSystemFields & Record<string, string | number | boolean | undefined>
   created_at: string
   human_fields: Record<string, string | number | boolean | undefined>
   ordered_human_fields: NetlifyHumanField[]

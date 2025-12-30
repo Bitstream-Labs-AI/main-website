@@ -1,4 +1,4 @@
-import { contactFormBaseSchema } from '../../../src/schemas/contact-form'
+import { contactFormBaseSchema } from '@/schemas'
 import { buildContactFormCard, sendGoogleChatMessage } from '../services/google-chat'
 
 export interface HandlerResult {
