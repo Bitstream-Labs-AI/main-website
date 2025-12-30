@@ -193,7 +193,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
 
   let captchaToken = ''
   try {
-    captchaToken = window.grecaptcha?.getResponse() || ''
+    captchaToken = window.grecaptcha?.getResponse() || (import.meta.env.DEV ? 'dev-token' : '')
   } catch (e) {
     console.error('reCAPTCHA not loaded:', e)
   }
@@ -229,6 +229,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
   // Validate using ZOD schema
   if (!validate(formData)) {
     // Ensure errors are visible by forcing a re-render
+    submitStatus.value = 'error'
     return
   }
 
@@ -508,18 +509,18 @@ const handleSubmit = async (event: Event): Promise<void> => {
       <div class="pt-2"></div>
 
       <!-- Status Messages -->
-      <div v-if="submitStatus === 'success'" class="pt-2 message-success pb-2">
+      <div v-if="submitStatus === 'success'" class="pt-2 message-success mb-2">
         <p>Thank you for your message! We'll get back to you soon.</p>
       </div>
 
-      <div v-if="submitStatus === 'error'" class="pt-2 message-error pb-2">
+      <div v-if="submitStatus === 'error'" class="pt-2 message-error mb-2">
         <p>An error occurred while submitting your message. Please try again.</p>
       </div>
 
       <div data-netlify-recaptcha="true"></div>
 
       <!-- Submit Button -->
-      <div class="pt-6">
+      <div class="pt-4">
         <button
           type="submit"
           :disabled="isSubmitting"

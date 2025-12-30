@@ -1,10 +1,10 @@
 import { config } from '../config'
 import type {
-  ContactFormData,
+  ContactFormBaseData,
   GoogleChatPayload,
   GoogleChatCard,
   GoogleChatWidget,
-} from '../../../src/schemas'
+} from '@/schemas'
 
 export async function sendGoogleChatMessage(payload: GoogleChatPayload): Promise<void> {
   const webhookUrl = config.GOOGLE_CHAT_WEBHOOK_URL
@@ -21,7 +21,7 @@ export async function sendGoogleChatMessage(payload: GoogleChatPayload): Promise
   }
 }
 
-export function buildContactFormCard(data: ContactFormData): GoogleChatPayload {
+export function buildContactFormCard(data: ContactFormBaseData): GoogleChatPayload {
   // 1. Prepare Widgets using 'decoratedText' (V2 standard)
   const contactWidgets: GoogleChatWidget[] = [
     {
