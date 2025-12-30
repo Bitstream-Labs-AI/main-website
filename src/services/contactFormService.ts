@@ -1,5 +1,17 @@
 import type { ContactFormData, FormValue } from '../schemas'
 
+const MASTER_BLUEPRINT = {
+  'form-name': 'contact',
+  'bot-field': '',
+  name: '',
+  email: '',
+  organizationName: '', // Optional
+  organizationDescription: '', // Optional
+  referralSource: '', // Optional
+  message: '',
+  marketingConsent: 'false', // Always a string
+}
+
 // Replace 'any' with the specific union type
 const encode = (data: Record<string, FormValue>): string => {
   const params = new URLSearchParams()
@@ -26,6 +38,11 @@ export async function submitContactForm(data: ContactFormData): Promise<void> {
   try {
     // CHANGE 1: Post to the site root ("/")
     // CHANGE 2: Send URL-encoded data, NOT JSON
+    const normalizedData = {
+      ...MASTER_BLUEPRINT,
+      ...data,
+    }
+
     const response = await fetch('/', {
       method: 'POST',
       headers: {
@@ -33,9 +50,7 @@ export async function submitContactForm(data: ContactFormData): Promise<void> {
       },
       // CHANGE 3: Include the 'form-name' field (must match your HTML form name attribute)
       body: encode({
-        'form-name': 'contact', // <--- CRITICAL: Must match <form name="contact">
-        'bot-field': '', // Add this even if it's empty!
-        ...data,
+        ...normalizedData,
       }),
     })
 
