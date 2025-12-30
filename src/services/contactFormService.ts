@@ -10,6 +10,7 @@ const MASTER_BLUEPRINT = {
   referralSource: '', // Optional
   message: '',
   marketingConsent: 'false', // Always a string
+  'g-recaptcha-response': 'Please complete the reCAPTCHA',
 }
 
 // Replace 'any' with the specific union type

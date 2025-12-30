@@ -85,6 +85,7 @@ export const contactFormSchema = z.object({
     }
     return val
   }, z.boolean().default(false)),
+  'g-recaptcha-response': z.string().min(1, 'Please complete the reCAPTCHA'),
 })
 
 /**

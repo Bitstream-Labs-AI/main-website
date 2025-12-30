@@ -191,6 +191,13 @@ const handleSubmit = async (event: Event): Promise<void> => {
   // Clear previous errors
   errors.value = {}
 
+  let captchaToken = ''
+  try {
+    captchaToken = window.grecaptcha?.getResponse() || ''
+  } catch (e) {
+    console.error('reCAPTCHA not loaded:', e)
+  }
+
   // Build form data object with trimmed and clamped values
   // Clamp to max lengths to prevent oversized data from reaching the backend
   const formData: Partial<ContactFormData> = {
@@ -198,6 +205,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
     email: email.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.email),
     message: message.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.message),
     marketingConsent: marketingConsent.value,
+    'g-recaptcha-response': captchaToken, // MUST match the key in your Zod schema
   }
 
   if (organizationName.value.trim()) {

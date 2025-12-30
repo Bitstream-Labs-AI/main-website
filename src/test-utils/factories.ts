@@ -9,6 +9,7 @@ export function createMockContactFormData(overrides?: Partial<ContactFormData>):
     email: 'john.doe@example.com',
     message: 'This is a test message',
     marketingConsent: false,
+    'g-recaptcha-response': 'mock-captcha-token',
     ...overrides,
   }
 }

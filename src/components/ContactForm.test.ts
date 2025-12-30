@@ -1,9 +1,13 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ContactForm from './ContactForm.vue'
 import { createMockContactFormData } from '@/test-utils/factories'
 
 describe('ContactForm', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('renders form fields', () => {
     const wrapper = mount(ContactForm)
 
