@@ -11,10 +11,6 @@ const MASTER_BLUEPRINT = {
   message: '',
   marketingConsent: 'false', // Always a string
   'g-recaptcha-response': 'Please complete the reCAPTCHA',
-  title: 'Contact From',
-  company: '',
-  summary: '',
-  body: '',
 }
 
 // Replace 'any' with the specific union type
@@ -47,10 +43,6 @@ export async function submitContactForm(data: ContactFormFrontendData): Promise<
       ...MASTER_BLUEPRINT,
       ...data,
     }
-
-    normalizedData['company'] = normalizedData['organizationName']
-    normalizedData['body'] = normalizedData['message']
-    normalizedData['summary'] = `Message from ${normalizedData['message']}`
 
     const response = await fetch('/', {
       method: 'POST',

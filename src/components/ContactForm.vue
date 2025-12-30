@@ -288,12 +288,6 @@ const handleSubmit = async (event: Event): Promise<void> => {
       <!-- Hidden fields -->
       <input type="hidden" name="form-name" value="contact" />
 
-      <!-- TBD -->
-      <input type="hidden" name="title" />
-      <input type="hidden" name="company" />
-      <input type="hidden" name="summary" />
-      <input type="hidden" name="body" />
-
       <p class="hidden">
         <label>Don’t fill this out if you’re human: <input name="bot-field" /></label>
       </p>
