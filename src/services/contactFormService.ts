@@ -1,4 +1,4 @@
-import type { ContactFormData, FormValue } from '../schemas'
+import type { ContactFormFrontendData, FormValue } from '../schemas'
 
 const MASTER_BLUEPRINT = {
   'form-name': 'contact',
@@ -30,7 +30,7 @@ const encode = (data: Record<string, FormValue>): string => {
   return params.toString()
 }
 
-export async function submitContactForm(data: ContactFormData): Promise<void> {
+export async function submitContactForm(data: ContactFormFrontendData): Promise<void> {
   const apiEnabled = import.meta.env.VITE_CONTACT_API_ENABLED
   if (apiEnabled === 'false' || (import.meta.env.MODE === 'test' && apiEnabled !== 'true')) {
     return Promise.resolve()

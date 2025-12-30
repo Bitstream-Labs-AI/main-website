@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ContactForm from './ContactForm.vue'
-import { createMockContactFormData } from '@/test-utils/factories'
+import { createMockContactFormFrontendData } from '@/test-utils/factories'
 
 describe('ContactForm', () => {
   beforeEach(() => {
@@ -28,7 +28,7 @@ describe('ContactForm', () => {
 
   it('displays validation error when email is empty', async () => {
     const wrapper = mount(ContactForm)
-    const formData = createMockContactFormData()
+    const formData = createMockContactFormFrontendData()
 
     const nameInput = wrapper.find('input[name="name"]')
     const emailInput = wrapper.find('input[name="email"]')
@@ -49,7 +49,7 @@ describe('ContactForm', () => {
 
   it('displays validation error when email format is invalid', async () => {
     const wrapper = mount(ContactForm)
-    const formData = createMockContactFormData({ email: 'invalid-email' })
+    const formData = createMockContactFormFrontendData({ email: 'invalid-email' })
 
     const nameInput = wrapper.find('input[name="name"]')
     const emailInput = wrapper.find('input[name="email"]')
@@ -64,7 +64,7 @@ describe('ContactForm', () => {
 
   it('displays validation error when message is empty', async () => {
     const wrapper = mount(ContactForm)
-    const formData = createMockContactFormData({ message: '' })
+    const formData = createMockContactFormFrontendData({ message: '' })
 
     const nameInput = wrapper.find('input[name="name"]')
     const emailInput = wrapper.find('input[name="email"]')
@@ -85,7 +85,7 @@ describe('ContactForm', () => {
       },
     })
 
-    const formData = createMockContactFormData()
+    const formData = createMockContactFormFrontendData()
 
     const nameInput = wrapper.find('input[name="name"]')
     const emailInput = wrapper.find('input[name="email"]')
@@ -108,7 +108,7 @@ describe('ContactForm', () => {
       },
     })
 
-    const formData = createMockContactFormData()
+    const formData = createMockContactFormFrontendData()
 
     const nameInput = wrapper.find('input[name="name"]')
     const emailInput = wrapper.find('input[name="email"]')
@@ -132,7 +132,7 @@ describe('ContactForm', () => {
       },
     })
 
-    const formData = createMockContactFormData()
+    const formData = createMockContactFormFrontendData()
 
     const nameInput = wrapper.find('input[name="name"]')
     const emailInput = wrapper.find('input[name="email"]')

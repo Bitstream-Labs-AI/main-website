@@ -1,19 +1,11 @@
 import type { Handler } from '@netlify/functions'
 import { handleContactSubmission } from './handlers/contact-submission'
+import { NetlifySubmissionBody } from '@/schemas'
 
 // Define the Handler Result type inline for simplicity
 interface HandlerResult {
   statusCode: number
   body?: string
-}
-
-interface NetlifySubmissionBody {
-  payload: {
-    form_name: string
-    number: number
-    created_at: string
-    data: Record<string, string | number | boolean | undefined>
-  }
 }
 
 // Update the type definition to require a return value
@@ -33,34 +25,33 @@ export const handler: Handler = async (event) => {
 
   try {
     // REST Pattern: 400 Bad Request (Malformed JSON)
-    console.debug(event.body)
+    // console.debug(event.body)
     body = JSON.parse(event.body) as NetlifySubmissionBody
   } catch (error) {
     console.error(error)
     return { statusCode: 400, body: 'Invalid JSON format' }
   }
 
-  const { payload } = body
-  const formData = payload.data
+  const { form_name, data, number } = body.payload
 
   // Safe extraction of form name
-  const formName = payload.form_name || 'unknown'
-  const processingFunction = FORM_HANDLERS[formName]
+
+  const processingFunction = FORM_HANDLERS[form_name]
 
   // REST Pattern: 404 Not Found (Resource/Handler does not exist)
   if (!processingFunction) {
-    console.warn(`No handler found for form: "${formName}"`)
+    console.warn(`No handler found for form: "${form_name}"`)
     return {
       statusCode: 404,
-      body: `No handler defined for form "${formName}"`,
+      body: `No handler defined for form "${form_name}"`,
     }
   }
 
   try {
-    console.log(`Routing submission #${payload.number} to ${formName} handler`)
+    console.log(`Routing submission #${number} to ${form_name} handler`)
 
     // Execute and return the specific status code from the handler
-    const result = await processingFunction(formData)
+    const result = await processingFunction(data)
 
     return {
       statusCode: result.statusCode,

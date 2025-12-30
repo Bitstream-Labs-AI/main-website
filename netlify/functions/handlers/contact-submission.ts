@@ -1,4 +1,4 @@
-import { contactFormSchema } from '../../../src/schemas/contact-form'
+import { contactFormBaseSchema } from '../../../src/schemas/contact-form'
 import { buildContactFormCard, sendGoogleChatMessage } from '../services/google-chat'
 
 export interface HandlerResult {
@@ -17,7 +17,7 @@ export async function handleContactSubmission(data: unknown): Promise<HandlerRes
 
   // 1. Validation Logic
   // We use safeParse to handle invalid data gracefully without throwing
-  const result = contactFormSchema.safeParse(data)
+  const result = contactFormBaseSchema.safeParse(data)
 
   if (!result.success) {
     console.warn('Validation failed:', result.error.message)

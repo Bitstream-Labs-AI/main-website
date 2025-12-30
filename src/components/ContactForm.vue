@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import {
-  contactFormSchema,
-  type ContactFormData,
+  contactFormFrontendSchema,
+  type ContactFormFrontendData,
   CONTACT_FORM_MAX_LENGTHS,
-} from '../schemas/contact-form'
+} from '../schemas'
 
 interface Props {
-  onSubmit?: (data: ContactFormData) => Promise<void> | void
+  onSubmit?: (data: ContactFormFrontendData) => Promise<void> | void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -159,21 +159,21 @@ const referralSource = ref('')
 const message = ref('')
 const marketingConsent = ref(false)
 
-const errors = ref<Partial<Record<keyof ContactFormData, string>>>({})
+const errors = ref<Partial<Record<keyof ContactFormFrontendData, string>>>({})
 const isSubmitting = ref(false)
 const submitStatus = ref<'idle' | 'success' | 'error'>('idle')
 
 // Schema is imported from shared location for consistency with backend
 
-const validate = (formData: Partial<ContactFormData>): boolean => {
+const validate = (formData: Partial<ContactFormFrontendData>): boolean => {
   errors.value = {}
 
-  const result = contactFormSchema.safeParse(formData)
+  const result = contactFormFrontendSchema.safeParse(formData)
 
   if (!result.success) {
     // Map ZOD errors to the existing error format
     result.error.issues.forEach((issue) => {
-      const field = issue.path[0] as keyof ContactFormData
+      const field = issue.path[0] as keyof ContactFormFrontendData
       if (field) {
         errors.value[field] = issue.message
       }
@@ -200,7 +200,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
 
   // Build form data object with trimmed and clamped values
   // Clamp to max lengths to prevent oversized data from reaching the backend
-  const formData: Partial<ContactFormData> = {
+  const formData: Partial<ContactFormFrontendData> = {
     name: name.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.name),
     email: email.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.email),
     message: message.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.message),
@@ -236,8 +236,8 @@ const handleSubmit = async (event: Event): Promise<void> => {
   submitStatus.value = 'idle'
 
   try {
-    // Use validated form data (ZOD ensures it matches ContactFormData type)
-    const validatedData = contactFormSchema.parse(formData) as ContactFormData
+    // Use validated form data (ZOD ensures it matches ContactFormFrontendData type)
+    const validatedData = contactFormFrontendSchema.parse(formData) as ContactFormFrontendData
 
     if (props.onSubmit) {
       await props.onSubmit(validatedData)
