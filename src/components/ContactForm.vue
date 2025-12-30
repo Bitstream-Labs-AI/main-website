@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import {
-  contactFormSchema,
-  type ContactFormData,
+  contactFormFrontendSchema,
+  type ContactFormFrontendData,
   CONTACT_FORM_MAX_LENGTHS,
-} from '../schemas/contact-form'
+} from '../schemas'
 
 interface Props {
-  onSubmit?: (data: ContactFormData) => Promise<void> | void
+  onSubmit?: (data: ContactFormFrontendData) => Promise<void> | void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -157,22 +157,23 @@ const organizationName = ref('')
 const organizationDescription = ref('')
 const referralSource = ref('')
 const message = ref('')
+const marketingConsent = ref(false)
 
-const errors = ref<Partial<Record<keyof ContactFormData, string>>>({})
+const errors = ref<Partial<Record<keyof ContactFormFrontendData, string>>>({})
 const isSubmitting = ref(false)
 const submitStatus = ref<'idle' | 'success' | 'error'>('idle')
 
 // Schema is imported from shared location for consistency with backend
 
-const validate = (formData: Partial<ContactFormData>): boolean => {
+const validate = (formData: Partial<ContactFormFrontendData>): boolean => {
   errors.value = {}
 
-  const result = contactFormSchema.safeParse(formData)
+  const result = contactFormFrontendSchema.safeParse(formData)
 
   if (!result.success) {
     // Map ZOD errors to the existing error format
     result.error.issues.forEach((issue) => {
-      const field = issue.path[0] as keyof ContactFormData
+      const field = issue.path[0] as keyof ContactFormFrontendData
       if (field) {
         errors.value[field] = issue.message
       }
@@ -190,12 +191,21 @@ const handleSubmit = async (event: Event): Promise<void> => {
   // Clear previous errors
   errors.value = {}
 
+  let captchaToken = ''
+  try {
+    captchaToken = window.grecaptcha?.getResponse() || (import.meta.env.DEV ? 'dev-token' : '')
+  } catch (e) {
+    console.error('reCAPTCHA not loaded:', e)
+  }
+
   // Build form data object with trimmed and clamped values
   // Clamp to max lengths to prevent oversized data from reaching the backend
-  const formData: Partial<ContactFormData> = {
+  const formData: Partial<ContactFormFrontendData> = {
     name: name.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.name),
     email: email.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.email),
     message: message.value.trim().slice(0, CONTACT_FORM_MAX_LENGTHS.message),
+    marketingConsent: marketingConsent.value,
+    'g-recaptcha-response': captchaToken, // MUST match the key in your Zod schema
   }
 
   if (organizationName.value.trim()) {
@@ -219,6 +229,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
   // Validate using ZOD schema
   if (!validate(formData)) {
     // Ensure errors are visible by forcing a re-render
+    submitStatus.value = 'error'
     return
   }
 
@@ -226,8 +237,8 @@ const handleSubmit = async (event: Event): Promise<void> => {
   submitStatus.value = 'idle'
 
   try {
-    // Use validated form data (ZOD ensures it matches ContactFormData type)
-    const validatedData = contactFormSchema.parse(formData) as ContactFormData
+    // Use validated form data (ZOD ensures it matches ContactFormFrontendData type)
+    const validatedData = contactFormFrontendSchema.parse(formData) as ContactFormFrontendData
 
     if (props.onSubmit) {
       await props.onSubmit(validatedData)
@@ -242,6 +253,8 @@ const handleSubmit = async (event: Event): Promise<void> => {
     organizationDescription.value = ''
     referralSource.value = ''
     message.value = ''
+    marketingConsent.value = false
+
     errors.value = {}
   } catch {
     submitStatus.value = 'error'
@@ -262,7 +275,22 @@ const handleSubmit = async (event: Event): Promise<void> => {
       </p>
     </div>
 
-    <form @submit="handleSubmit" class="card">
+    <form
+      name="contact"
+      method="POST"
+      action="/"
+      data-netlify="true"
+      data-netlify-honeypot="bot-field"
+      @submit.prevent="handleSubmit"
+      class="card"
+      data-netlify-recaptcha="true"
+    >
+      <input type="hidden" name="form-name" value="contact" />
+
+      <p class="hidden">
+        <label>Don’t fill this out if you’re human: <input name="bot-field" /></label>
+      </p>
+
       <!-- Name Field -->
       <div class="pb-4">
         <label for="name" class="block text-body font-black text-primary pb-2"> Your Name </label>
@@ -451,23 +479,54 @@ const handleSubmit = async (event: Event): Promise<void> => {
         </p>
       </div>
 
+      <div class="pb-4">
+        <div class="flex items-start gap-3">
+          <div class="flex h-6 items-center">
+            <input
+              id="marketingConsent"
+              v-model="marketingConsent"
+              name="marketingConsent"
+              type="checkbox"
+              class="h-5 w-5 rounded border-industrial-steel bg-industrial-slate text-futurist-cyan focus:ring-futurist-cyan/50 focus:ring-offset-0 transition duration-150 ease-in-out cursor-pointer"
+            />
+          </div>
+          <div class="text-sm leading-6">
+            <label
+              for="marketingConsent"
+              class="block text-body font-black text-primary pb-2 cursor-pointer"
+            >
+              Stay Updated
+            </label>
+            <p class="text-muted"></p>
+          </div>
+        </div>
+
+        <p class="pt-2 text-body-small text-muted">
+          Get occasional updates and news about AI benchmarking and R&D insights.
+        </p>
+      </div>
+
+      <div class="pt-2"></div>
+
       <!-- Status Messages -->
-      <div v-if="submitStatus === 'success'" class="pt-2 message-success">
+      <div v-if="submitStatus === 'success'" class="pt-2 message-success mb-2">
         <p>Thank you for your message! We'll get back to you soon.</p>
       </div>
 
-      <div v-if="submitStatus === 'error'" class="pt-2 message-error">
+      <div v-if="submitStatus === 'error'" class="pt-2 message-error mb-2">
         <p>An error occurred while submitting your message. Please try again.</p>
       </div>
 
+      <div data-netlify-recaptcha="true"></div>
+
       <!-- Submit Button -->
-      <div class="pt-6">
+      <div class="pt-4">
         <button
           type="submit"
           :disabled="isSubmitting"
           class="btn-primary w-full text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
         >
-          <span v-if="!isSubmitting">Let's Go!</span>
+          <span v-if="!isSubmitting">Submit Inquiry</span>
           <span v-else>Sending...</span>
         </button>
       </div>

@@ -1,3 +1,8 @@
+# netlify.toml
+[build]
+  publish = "dist/client"
+  command = "pnpm run build"
+
 # QR Code redirects for contact vCards
 # These redirects provide stable URLs for QR codes that point to contact information.
 # The subdomain qrcode-redirect.bitstreamlabs.ai must be configured in Netlify

@@ -1,66 +1,70 @@
-import type { ContactFormData } from '../schemas/contact-form'
+import type { ContactFormFrontendData, FormValue } from '../schemas'
 
-/**
- * API response types
- */
-interface ContactFormResponse {
-  success: boolean
-  message?: string
-  error?: string
+const MASTER_BLUEPRINT = {
+  'form-name': 'contact',
+  'bot-field': '',
+  name: '',
+  email: '',
+  organizationName: '', // Optional
+  organizationDescription: '', // Optional
+  referralSource: '', // Optional
+  message: '',
+  marketingConsent: 'false', // Always a string
+  'g-recaptcha-response': 'Please complete the reCAPTCHA',
 }
 
-/**
- * Submits contact form data to the backend API.
- *
- * @param data - The contact form data to submit
- * @throws {Error} If the API call fails or returns an error
- */
-export async function submitContactForm(data: ContactFormData): Promise<void> {
-  // Check if API calls are disabled (for testing)
+// Replace 'any' with the specific union type
+const encode = (data: Record<string, FormValue>): string => {
+  const params = new URLSearchParams()
+
+  Object.entries(data).forEach(([key, value]) => {
+    // If value is null/undefined, send an empty string instead of skipping
+    if (value === null || value === undefined) {
+      params.append(key, '')
+    } else {
+      // Handle booleans specifically to ensure 'true'/'false' strings
+      params.append(key, String(value))
+    }
+  })
+
+  return params.toString()
+}
+
+export async function submitContactForm(data: ContactFormFrontendData): Promise<void> {
   const apiEnabled = import.meta.env.VITE_CONTACT_API_ENABLED
-  // If explicitly set to 'false', or in test mode and not explicitly enabled, disable API calls
   if (apiEnabled === 'false' || (import.meta.env.MODE === 'test' && apiEnabled !== 'true')) {
-    // No-op for testing - return immediately without making HTTP request
     return Promise.resolve()
   }
 
-  // Get API endpoint from environment variable
-  const apiUrl = import.meta.env.VITE_CONTACT_API_URL
-  if (!apiUrl) {
-    throw new Error('Contact form API endpoint is not configured. Please set VITE_CONTACT_API_URL.')
-  }
-
   try {
-    const response = await fetch(apiUrl, {
+    // CHANGE 1: Post to the site root ("/")
+    // CHANGE 2: Send URL-encoded data, NOT JSON
+    const normalizedData = {
+      ...MASTER_BLUEPRINT,
+      ...data,
+    }
+
+    const response = await fetch('/', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(data),
+      // CHANGE 3: Include the 'form-name' field (must match your HTML form name attribute)
+      body: encode({
+        ...normalizedData,
+      }),
     })
 
     if (!response.ok) {
-      let errorMessage = 'Failed to submit contact form'
-
-      try {
-        const errorData: ContactFormResponse = await response.json()
-        errorMessage = errorData.error || errorMessage
-      } catch {
-        // If response is not JSON, use status text
-        errorMessage = response.statusText || errorMessage
-      }
-
-      throw new Error(errorMessage)
+      throw new Error('Form submission failed')
     }
 
-    // Parse response to check for success
-    const result: ContactFormResponse = await response.json()
-
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to submit contact form')
-    }
+    // Note: Netlify returns a 200 OK for successful form submissions.
+    // It usually does NOT return JSON unless you redirect to a JSON file.
+    // Usually, just checking response.ok is sufficient here.
+    // const responseParsed = (await response.json()) as ContactFormResponse
+    console.log(response)
   } catch (error) {
-    // Re-throw if it's already an Error, otherwise wrap it
     if (error instanceof Error) {
       throw error
     }

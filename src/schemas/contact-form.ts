@@ -20,7 +20,7 @@ export const CONTACT_FORM_MAX_LENGTHS = {
  * Both frontend and backend should import and use this schema to ensure
  * type safety and validation consistency.
  */
-export const contactFormSchema = z.object({
+export const contactFormBaseSchema = z.object({
   name: z
     .string()
     .trim()
@@ -79,10 +79,28 @@ export const contactFormSchema = z.object({
       CONTACT_FORM_MAX_LENGTHS.message,
       `Message must be ${CONTACT_FORM_MAX_LENGTHS.message} characters or less`,
     ),
+  marketingConsent: z.preprocess((val) => {
+    if (typeof val === 'string') {
+      return val === 'true' || val === 'on'
+    }
+    return val
+  }, z.boolean().default(false)),
 })
 
 /**
- * TypeScript type derived from the Zod schema.
- * This ensures the type always matches the validation schema.
+ * FRONTEND SCHEMA (The submission data)
+ * This extends the base to include the transport-only reCAPTCHA token.
  */
-export type ContactFormData = z.infer<typeof contactFormSchema>
+export const contactFormFrontendSchema = contactFormBaseSchema.extend({
+  'g-recaptcha-response': z.string().min(1, 'Please complete the reCAPTCHA'),
+})
+
+// Types
+export type ContactFormBaseData = z.infer<typeof contactFormBaseSchema>
+export type ContactFormFrontendData = z.infer<typeof contactFormFrontendSchema>
+
+export interface ContactFormResponse {
+  success: boolean
+  message?: string
+  error?: string
+}

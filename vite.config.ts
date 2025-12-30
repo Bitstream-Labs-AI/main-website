@@ -1,15 +1,29 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig, type PluginOption } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
+import vike from 'vike/plugin'
 
-// https://vite.dev/config/
 export default defineConfig(() => {
-  const plugins: PluginOption[] = [vue(), vueJsx(), tailwindcss()]
-
+  const plugins: PluginOption[] = [
+    tailwindcss(),
+    vue({
+      template: {
+        compilerOptions: {
+          // 1. Minifies whitespace in Vue templates
+          whitespace: 'condense',
+          // 2. Strips comments from the compiled Vue templates
+          comments: false,
+        },
+      },
+    }),
+    vueJsx(),
+    vike({
+      prerender: true,
+    }),
+  ]
   // Only enable Vue DevTools in development mode (not in test/production)
   // Check if we're running in test mode (set by Playwright)
   if (process.env.NODE_ENV !== 'test') {
@@ -51,6 +65,26 @@ export default defineConfig(() => {
     },
     preview: {
       allowedHosts: previewAllowedHosts,
+    },
+    build: {
+      // 3. Use Terser for aggressive minification and comment removal
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+        },
+        format: {
+          // 4. Force all JS/CSS comments to be stripped
+          comments: false,
+        },
+      },
+      rollupOptions: {
+        onwarn(warning, warn) {
+          if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return
+          warn(warning)
+        },
+      },
     },
   }
 })
