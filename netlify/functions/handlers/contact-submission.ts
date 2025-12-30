@@ -42,8 +42,7 @@ export async function handleContactSubmission(data: unknown): Promise<HandlerRes
 
     // Send the notification via the service layer
     await sendGoogleChatMessage(chatPayload)
-
-    console.log(`Successfully notified Google Chat for: ${validData.email}`)
+    console.info(`Successfully notified Google Chat`)
 
     // TODO: Add Email Service logic here (e.g., await sendAutoReply(validData))
 
