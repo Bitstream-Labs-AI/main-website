@@ -9,9 +9,10 @@ interface HandlerResult {
 
 interface NetlifySubmissionBody {
   payload: {
+    form_name: string
     number: number
     created_at: string
-    data: Record<string, unknown>
+    data: Record<string, string | number | boolean | undefined>
   }
 }
 
@@ -32,6 +33,7 @@ export const handler: Handler = async (event) => {
 
   try {
     // REST Pattern: 400 Bad Request (Malformed JSON)
+    console.debug(event.body)
     body = JSON.parse(event.body) as NetlifySubmissionBody
   } catch (error) {
     console.error(error)
@@ -42,8 +44,7 @@ export const handler: Handler = async (event) => {
   const formData = payload.data
 
   // Safe extraction of form name
-  const formName = typeof formData['form-name'] === 'string' ? formData['form-name'] : 'unknown'
-
+  const formName = payload.form_name || 'unknown'
   const processingFunction = FORM_HANDLERS[formName]
 
   // REST Pattern: 404 Not Found (Resource/Handler does not exist)
