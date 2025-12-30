@@ -8,7 +8,16 @@ import vike from 'vike/plugin'
 
 export default defineConfig(() => {
   const plugins: PluginOption[] = [
-    vue(),
+    vue({
+      template: {
+        compilerOptions: {
+          // 1. Minifies whitespace in Vue templates
+          whitespace: 'condense',
+          // 2. Strips comments from the compiled Vue templates
+          comments: false,
+        },
+      },
+    }),
     vueJsx(),
     tailwindcss(),
     vike({
@@ -56,6 +65,26 @@ export default defineConfig(() => {
     },
     preview: {
       allowedHosts: previewAllowedHosts,
+    },
+    build: {
+      // 3. Use Terser for aggressive minification and comment removal
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+        },
+        format: {
+          // 4. Force all JS/CSS comments to be stripped
+          comments: false,
+        },
+      },
+      rollupOptions: {
+        onwarn(warning, warn) {
+          if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return
+          warn(warning)
+        },
+      },
     },
   }
 })
