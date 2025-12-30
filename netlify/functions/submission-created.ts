@@ -20,6 +20,7 @@ export const handler: Handler = async (event) => {
   if (!event.body) {
     return { statusCode: 400, body: 'Missing request body' }
   }
+  console.debug(event.body)
 
   let body: NetlifySubmissionBody
 
