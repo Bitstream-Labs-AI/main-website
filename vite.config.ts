@@ -8,6 +8,7 @@ import vike from 'vike/plugin'
 
 export default defineConfig(() => {
   const plugins: PluginOption[] = [
+    tailwindcss(),
     vue({
       template: {
         compilerOptions: {
@@ -19,7 +20,6 @@ export default defineConfig(() => {
       },
     }),
     vueJsx(),
-    tailwindcss(),
     vike({
       prerender: true,
     }),
