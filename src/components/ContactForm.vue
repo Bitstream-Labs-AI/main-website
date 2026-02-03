@@ -285,6 +285,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
       class="card"
       data-netlify-recaptcha="true"
     >
+      <!-- Hidden fields -->
       <input type="hidden" name="form-name" value="contact" />
 
       <p class="hidden">

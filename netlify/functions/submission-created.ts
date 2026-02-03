@@ -25,7 +25,6 @@ export const handler: Handler = async (event) => {
 
   try {
     // REST Pattern: 400 Bad Request (Malformed JSON)
-    // console.debug(event.body)
     body = JSON.parse(event.body) as NetlifySubmissionBody
   } catch (error) {
     console.error(error)

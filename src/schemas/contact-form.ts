@@ -5,12 +5,12 @@ import { z } from 'zod'
  * These constants are used for validation and HTML attributes to ensure consistency.
  */
 export const CONTACT_FORM_MAX_LENGTHS = {
-  name: 100, // Full name (first + last)
-  email: 254, // RFC 5321 standard
+  name: 100, // Full name (first + last), [PII]
+  email: 254, // RFC 5321 standard, [PII]
   organizationName: 150, // Organization names can be long but 150 is sufficient
   organizationDescription: 2000,
-  referralSource: 100, // Referral sources are typically short
-  message: 5000,
+  referralSource: 100, // Referral sources are typically short [PII]
+  message: 5000, // may contain [PII]
 } as const
 
 /**
@@ -28,7 +28,7 @@ export const contactFormBaseSchema = z.object({
     .max(
       CONTACT_FORM_MAX_LENGTHS.name,
       `Name must be ${CONTACT_FORM_MAX_LENGTHS.name} characters or less`,
-    ),
+    ), // [PII]
   email: z
     .string()
     .trim()
@@ -46,7 +46,7 @@ export const contactFormBaseSchema = z.object({
       {
         message: 'Please enter a valid email address',
       },
-    ),
+    ), // [PII]
   organizationName: z
     .string()
     .trim()
@@ -70,7 +70,7 @@ export const contactFormBaseSchema = z.object({
       CONTACT_FORM_MAX_LENGTHS.referralSource,
       `Referral source must be ${CONTACT_FORM_MAX_LENGTHS.referralSource} characters or less`,
     )
-    .optional(),
+    .optional(), // [PII]
   message: z
     .string()
     .trim()
