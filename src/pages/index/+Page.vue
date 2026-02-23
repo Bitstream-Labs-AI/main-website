@@ -99,7 +99,7 @@ const handleContactSubmit = async (data: ContactFormData): Promise<void> => {
       <div class="container-content">
         <div class="flex flex-col items-center gap-6">
           <p class="text-body-xs text-muted">
-            &copy; {{ new Date().getFullYear() }} Bitstream Labs.AI. All rights reserved.
+            &copy; {{ new Date().getFullYear() }} Bitstream Labs, Inc. All rights reserved.
           </p>
           <div class="flex flex-wrap items-center justify-center gap-3">
             <a
